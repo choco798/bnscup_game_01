@@ -6,6 +6,7 @@
 constexpr int32 ShotSize = 10;
 constexpr int32 MaxShots = 3;
 
+// 自機体から発車する弾
 struct Shot
 {
 	double posX{};
@@ -13,6 +14,7 @@ struct Shot
 	bool isShot{};
 };
 
+// 表示物
 struct Sprite
 {
 	double posX{};
@@ -24,6 +26,7 @@ struct Sprite
 	int hp{};
 };
 
+// ゲームデータ、ゲームを通して利用する
 struct GameData
 {
 	// Assets
@@ -34,19 +37,22 @@ struct GameData
 	const Texture emojiDown{U"Images/player_down.png"};
 	const Texture background03{U"Images/background_03.png"};
 	const Texture background04{U"Images/background_04.png"};
+	const Texture emojiEnemy{U"🦖"_emoji};
+	const Texture emojiEnemy01{U"🐟"_emoji};
+	const Texture emojiEnemy02{U"🚗"_emoji};
 	const Font font{FontMethod::MSDF, 48, Typeface::Bold};
 
 	// State
 	int timer{};
-	const Texture emojiEnemy{U"🦖"_emoji};
-	const Texture emojiEnemy01{U"🐟"_emoji};
-	const Texture emojiEnemy02{U"🚗"_emoji};
 	int score{};
 
-	double mapPosX[5]{};
-	double mapPosY[5]{};
+	// 背景表示用の位置を格納した配列
+	double mapPosXList[5]{};
+	double mapPosYList[5]{};
 
+	// 発車する弾
 	Shot shots[10]{};
+	// 表示物
 	Sprite sprites[10]{};
 
 	int hitTime{};
@@ -54,6 +60,7 @@ struct GameData
 	bool clearFlag{};
 };
 
+// ゲームの初期化
 void GameInit(GameData* data)
 {
 	Scene::SetBackground(ColorF{Palette::Black});
@@ -105,20 +112,22 @@ void GameInit(GameData* data)
 	// Map
 	for (int i = 0; i < 5; ++i)
 	{
-		data->mapPosX[i] = 0;
-		data->mapPosY[i] = 0;
+		data->mapPosXList[i] = 0;
+		data->mapPosYList[i] = 0;
 	}
 }
 
+// 背景を動かすための処理
 void MapRoutine(GameData* data)
 {
-	data->mapPosX[0] -= 1;
-	if (data->mapPosX[0] < -800)
+	data->mapPosXList[0] -= 1;
+	if (data->mapPosXList[0] < -800)
 	{
-		data->mapPosX[0] = 0;
+		data->mapPosXList[0] = 0;
 	}
 }
 
+// 敵を動かすための処理
 void EnemyRoutine(GameData* data)
 {
 	if ((data->timer % 2) == 0)
@@ -141,11 +150,15 @@ void EnemyRoutine(GameData* data)
 		}
 	}
 
+	// 1の敵がループするようにする
 	if (data->sprites[1].posX <= -100)
 	{
 		data->sprites[1].posX = 800;
 	}
 
+	// TODO: 2,3の敵がループするようにする？もしかして意図的？
+
+	// 途中で敵が出現するようにする
 	if (data->timer == 3000)
 	{
 		data->sprites[2].posY = 100;
@@ -154,6 +167,7 @@ void EnemyRoutine(GameData* data)
 		data->sprites[3].posX = 800;
 	}
 
+	// 途中でボスが出現するようにする
 	if (data->timer == 5999)
 	{
 		data->sprites[6].posY = 300;
@@ -206,14 +220,17 @@ void EnemyRoutine(GameData* data)
 			data->sprites[3].posX = -100;
 			data->sprites[3].posY = -500;
 			data->sprites[3].hp = 30;
+			// ボスを撃破したらクリアフラグを立てる
 			data->clearFlag = true;
 		}
 		data->sprites[6].isHit = false;
 	}
 }
 
+// 弾を発射する＆動かす関数
 void ShotRoutine(GameData* data)
 {
+	// 弾を発射する
 	if (KeySpace.down())
 	{
 		if (!data->shots[data->shotIndex].isShot)
@@ -230,6 +247,7 @@ void ShotRoutine(GameData* data)
 		}
 	}
 
+	// 動かす関数
 	for (int i = 0; i < MaxShots; ++i)
 	{
 		if (data->shots[i].isShot)
@@ -248,6 +266,7 @@ void ShotRoutine(GameData* data)
 	}
 }
 
+// 入力に合わせてプレイヤーを動かす
 void PlayerRoutine(GameData* data)
 {
 	if (KeyLeft.pressed())
@@ -274,8 +293,10 @@ void PlayerRoutine(GameData* data)
 	ShotRoutine(data);
 }
 
+// 接触判定用の関数
 void JudgementRoutine(GameData* data)
 {
+	// 弾と敵の接触判定を行う
 	for (int i = 0; i < MaxShots; ++i)
 	{
 		if (Circle{data->shots[i].posX, data->shots[i].posY, ShotSize}
@@ -315,17 +336,24 @@ void JudgementRoutine(GameData* data)
 			data->hitTime = data->timer + 100;
 		}
 	}
+
+	// TODO:自機体と敵の接触によるダメージ判定を追加する
 }
 
+// 表示用関数
 void Print(GameData* data)
 {
-	data->background03.draw(data->mapPosX[0], data->mapPosY[0]);
+	// 背景を表示する、全体
+	data->background03.draw(data->mapPosXList[0], data->mapPosYList[0]);
 
+	// 背景を表示する、上部
 	for (int i = 0; i < 16; ++i)
 	{
 		data->background04.draw(50 * i, 0);
 	}
 
+	// 自機体と敵機体を表示する
+	// TODO: 自機体の方向に合わせた表示ができるようになる
 	data->emoji.scaled(0.75)
 		.mirrored(data->sprites[0].isFacingRight)
 		.drawAt(data->sprites[0].posX, data->sprites[0].posY);
@@ -346,6 +374,7 @@ void Print(GameData* data)
 		.mirrored(data->sprites[6].isFacingRight)
 		.drawAt(data->sprites[6].posX, data->sprites[6].posY);
 
+	// 発射した弾を表示する
 	for (int i = 0; i < MaxShots; ++i)
 	{
 		if (data->shots[i].isShot)
@@ -360,22 +389,28 @@ void Print(GameData* data)
 
 	if (data->timer <= data->hitTime)
 	{
+		// 弾が当たってから一定フレームの間Hit!と表示する
 		if (!data->clearFlag)
 		{
 			data->font(U"Hit!").draw(64, Vec2{0, 0}, {Palette::Gold});
 		}
 		else
 		{
+			// TODO: クリア後にCongraduationが見えないので直す
 			data->font(U"Congraduation!")
 				.draw(128, Vec2{0, 0}, {Palette::Gold});
 			System::Sleep(5000ms);
 			System::Exit();
 		}
 	}
+
+	// TODO: ゲームオーバー判定を追加する
 }
 
+// ゲームの進行用のタイマーを進める関数
 void TimerRoutine(GameData* data)
 {
+	// TODO: ゲームの進行管理をフレームから、Stopwatchを使った時間式に変更する
 	++(data->timer);
 	if (data->timer > 6000)
 	{
