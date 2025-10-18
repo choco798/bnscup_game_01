@@ -1,0 +1,34 @@
+{
+  "gameTitle": "ブレバトの季語探しゲーム",
+  "version": "1.0",
+  "problems": [
+    {
+      "id": "matsushima_001",
+      "author": "松尾芭蕉",
+      "source": "俳諧",
+      "text": "松島や ああ松島や 松島や",
+      "hasKigo": false,
+      "kigo": "",
+      "kigoStart": -1,
+      "kigoEnd": -1,
+      "explanation": "この句は地名反復の趣向で、一般に季語を含みません。",
+      "note": "季語なしボタンが正解",
+      "tags": ["有名句","季語なし"],
+      "displayRuby": false
+    },
+    {
+      "id": "furuike_001",
+      "author": "松尾芭蕉",
+      "source": "奥の細道",
+      "text": "古池や 蛙飛びこむ 水の音",
+      "hasKigo": true,
+      "kigo": "蛙",
+      "kigoStart": 5,
+      "kigoEnd": 6,
+      "explanation": "「蛙」は春の季語。",
+      "note": "",
+      "tags": ["春","有名句"],
+      "displayRuby": false
+    }
+  ]
+}
