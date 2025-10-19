@@ -15,8 +15,10 @@ class TextLayouter
 	const Font& m_font;
 	double m_maxLineWidth;
 	double m_lineHeightScale;
+	double m_lineWidthScale;
 
    public:
-	TextLayouter(const Font& font, double maxWidth, double lineHeightScale);
+	TextLayouter(const Font& font, double maxWidth, double lineHeightScale,
+				 double lineWidthScale);
 	Array<LayoutChar> layout(const String& text) const;
 };

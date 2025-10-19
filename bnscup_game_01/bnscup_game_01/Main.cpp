@@ -143,8 +143,8 @@ void Main()
 					System::MessageBoxOK(U"出題できる問題がありません。");
 					continue;
 				}
-				current =
-					std::make_unique<GameScene>(state, renderer, sound, config);
+				current = std::make_unique<GameScene>(state, renderer, sound,
+													  config, font);
 				scene = SceneID::Game;
 				continue;
 			}

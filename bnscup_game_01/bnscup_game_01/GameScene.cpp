@@ -3,10 +3,13 @@
 #include "GameScene.hpp"
 
 GameScene::GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
-					 Config& config)
-	: m_state{state}, m_renderer{renderer}, m_sound{sound}, m_config{config}
+					 Config& config, Font& font)
+	: m_state{state},
+	  m_renderer{renderer},
+	  m_sound{sound},
+	  m_config{config},
+	  m_font(font)
 {
-	m_font = Font(30);
 	startProblem();
 }
 
@@ -21,7 +24,7 @@ void GameScene::startProblem()
 	}
 
 	const auto& ui = m_config.ui();
-	TextLayouter layouter{m_font, ui.maxLineWidth, ui.lineHeightScale};
+	TextLayouter layouter{m_font, ui.maxLineWidth, ui.lineHeightScale, ui.lineWidthScale};
 	m_chars = layouter.layout(m_state.problems[m_state.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える

@@ -24,7 +24,7 @@ class GameScene : public SceneBase
 
    public:
 	GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
-			  Config& config);
+			  Config& config, Font& font);
 	void startProblem();
 	void update() override;
 	void draw() const override;

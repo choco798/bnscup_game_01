@@ -3,8 +3,11 @@
 #include "TextLayout.hpp"
 
 TextLayouter::TextLayouter(const Font& font, double maxWidth,
-						   double lineHeightScale)
-	: m_font{font}, m_maxLineWidth{maxWidth}, m_lineHeightScale{lineHeightScale}
+						   double lineHeightScale, double lineWidthScale)
+	: m_font{font},
+	  m_maxLineWidth{maxWidth},
+	  m_lineHeightScale{lineHeightScale},
+	  m_lineWidthScale{lineWidthScale}
 {
 }
 
@@ -12,10 +15,15 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 {
 	Array<LayoutChar> out;
 
-	const double lineHeight = m_font.height() * m_lineHeightScale;
+	double lineWidth = 0;
 
-	double x = 0.0;
-	double y = 0.0;
+	for (size_t i = 0; i < text.size(); ++i)
+	{
+		lineWidth = Max(lineWidth,m_font.getGlyph(text[i]).xAdvance * m_lineWidthScale);
+	}
+
+	double text_x = 0.0;
+	double text_y = 0.0;
 	int32 index = 0;
 
 	String token;
@@ -28,10 +36,10 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		for (const char32 ch : word)
 		{
 			const auto gi = m_font.getGlyph(ch);
-			RectF box{Arg::topLeft = Vec2{x, y}, gi.xAdvance,
+			RectF box{Arg::topLeft = Vec2{text_x, text_y}, gi.xAdvance,
 					  static_cast<double>(m_font.height())};
-			out << LayoutChar{ch, Vec2{x, y}, box, index++};
-			x += gi.xAdvance;
+			out << LayoutChar{ch, Vec2{text_x, text_y}, box, index++};
+			text_y += static_cast<double>(m_font.height());
 		}
 	};
 
@@ -40,12 +48,12 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		const char32 ch = text[i];
 
 		// 強制改行
-		if (ch == U'\n')
+		if (ch == U'*')
 		{
 			flushWord(token);
 			token.clear();
-			x = 0.0;
-			y += lineHeight;
+			text_y = 0.0;
+			text_x += lineWidth;
 			breakablePositions.clear();
 			continue;
 		}
@@ -63,12 +71,16 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		const double wordW = m_font(token).region().w;
 		const double spaceW = m_font(U" ").region().w;
 
-		if ((x + wordW + spaceW) > m_maxLineWidth &&
-			!breakablePositions.isEmpty())
+		const bool needBreak = true;
+
+		// 長さで改行をするか決める場合はこちらを利用する
+		// (x + wordW + spaceW) > m_maxLineWidth && !breakablePositions.isEmpty();
+
+		if (needBreak)
 		{
 			// 直前のスペースで改行
-			x = 0.0;
-			y += lineHeight;
+			text_y = 0.0;
+			text_x += lineWidth;
 			breakablePositions.clear();
 		}
 
@@ -79,10 +91,10 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		// スペースを 1 文字として位置進行（可視描画しないが矩形は持つ）
 		{
 			const auto gi = m_font.getGlyph(U' ');
-			RectF box{Arg::topLeft = Vec2{x, y}, gi.xAdvance,
+			RectF box{Arg::topLeft = Vec2{text_x, text_y}, gi.xAdvance,
 					  static_cast<double>(m_font.height())};
-			out << LayoutChar{U' ', Vec2{x, y}, box, index++};
-			x += gi.xAdvance;
+			out << LayoutChar{U' ', Vec2{text_x, text_y}, box, index++};
+			text_y += static_cast<double>(m_font.height());
 		}
 
 		// 改行候補に登録
@@ -92,11 +104,15 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	// 残りの単語を吐き出し
 	if (!token.isEmpty())
 	{
+
 		const double wordW = m_font(token).region().w;
-		if ((x + wordW) > m_maxLineWidth && !breakablePositions.isEmpty())
+		const bool needBreak = true;
+		// 長さで改行をするか決める場合はこちらを利用する
+		// (x + wordW) > m_maxLineWidth && !breakablePositions.isEmpty()
+		if (needBreak)
 		{
-			x = 0.0;
-			y += lineHeight;
+			text_y = 0.0;
+			text_x += lineWidth;
 			breakablePositions.clear();
 		}
 		flushWord(token);
