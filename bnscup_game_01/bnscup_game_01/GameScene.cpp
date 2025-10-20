@@ -3,12 +3,11 @@
 #include "GameScene.hpp"
 
 GameScene::GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
-					 Config& config, Font& font)
+					 Config& config)
 	: m_state{state},
 	  m_renderer{renderer},
 	  m_sound{sound},
-	  m_config{config},
-	  m_font(font)
+	  m_config{config}
 {
 	startProblem();
 }
@@ -24,7 +23,7 @@ void GameScene::startProblem()
 	}
 
 	const auto& ui = m_config.ui();
-	TextLayouter layouter{m_font, ui.maxLineWidth, ui.lineHeightScale, ui.lineWidthScale};
+	TextLayouter layouter{FontAsset(U"Game"), ui.maxLineWidth, ui.lineHeightScale, ui.lineWidthScale};
 	m_chars = layouter.layout(m_state.problems[m_state.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
@@ -47,7 +46,8 @@ void GameScene::draw() const
 
 	if (m_state.currentIndex >= m_state.problems.size())
 	{
-		m_font(U"問題がありません").drawAt(Scene::Center(), Palette::Black);
+		FontAsset(U"Game")(U"問題がありません")
+			.drawAt(Scene::Center(), Palette::Black);
 		return;
 	}
 
@@ -58,7 +58,8 @@ void GameScene::draw() const
 	{
 		const RoundRect btn{RectF{960, 140, 240, 60}, 16};
 		btn.draw(Palette::White).drawFrame(3, 0, Palette::Black);
-		m_font(U"季語なし").drawAt(btn.rect.center(), Palette::Black);
+		FontAsset(U"Game")(U"季語なし")
+			.drawAt(btn.rect.center(), Palette::Black);
 	}
 
 	// 先生リアクション

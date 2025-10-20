@@ -11,6 +11,7 @@
 #include "SceneBase.hpp"
 #include "SoundManager.hpp"
 #include "TitleScene.hpp"
+#include "Main.h"
 
 enum class SceneID
 {
@@ -38,29 +39,30 @@ RectF GetTitleExitRect()
 }
 
 // 簡易ヘルプ表示
-void DrawHowToOverlay(const Font& font)
+void DrawHowToOverlay()
 {
 	const RectF panel{140, 140, 1000, 440};
 	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.96});
 	panel.drawFrame(3, 0, Palette::Black);
-	font(U"あそびかた").draw(160, 160, Palette::Black);
+	FontAsset(U"Game")(U"あそびかた").draw(160, 160, Palette::Black);
 
-	const Font text{28};
-	text(U"・俳句の中の季語の文字をクリックします。")
+	FontAsset(U"HowToPlay")(U"・俳句の中の季語の文字をクリックします。")
 		.draw(160, 220, Palette::Black);
-	text(U"・季語が無い句は「季語なし」をクリックします。")
+	FontAsset(U"HowToPlay")(U"・季語が無い句は「季語なし」をクリックします。")
 		.draw(160, 260, Palette::Black);
-	text(U"・正解で +10 点。解説が表示されます。")
+	FontAsset(U"HowToPlay")(U"・正解で +10 点。解説が表示されます。")
 		.draw(160, 300, Palette::Black);
-	text(U"・本バージョンでは問題順はファイル順です。")
+	FontAsset(U"HowToPlay")(U"・本バージョンでは問題順はファイル順です。")
 		.draw(160, 340, Palette::Black);
-	text(U"・スコアは実行中のみ保持されます。").draw(160, 380, Palette::Black);
+	FontAsset(U"HowToPlay")(U"・スコアは実行中のみ保持されます。")
+		.draw(160, 380, Palette::Black);
 
 	s3d::RoundRect{
 		RectF{panel.x + panel.w - 200, panel.y + panel.h - 68, 160, 48}, 12}
 		.draw(Palette::White)
 		.drawFrame(3, 0, Palette::Black);
-	text(U"閉じる").drawAt(panel.x + panel.w - 120, panel.y + panel.h - 44,
+	FontAsset(U"HowToPlay")(U"閉じる").drawAt(
+		panel.x + panel.w - 120, panel.y + panel.h - 44,
 						   Palette::Black);
 }
 
@@ -69,6 +71,22 @@ bool ClickedCloseOnHowTo(const RectF& panel)
 	const RectF close{panel.x + panel.w - 200, panel.y + panel.h - 68, 160, 48};
 	return (close.mouseOver() && MouseL.down());
 }
+
+void InitializeGameAsset()
+{
+	// フォントアセットを登録する
+	FontAsset::Register(U"Title", FontMethod::MSDF, 64,
+						Typeface::CJK_Regular_JP);
+	FontAsset::Register(U"TitleText", FontMethod::MSDF, 32,
+						Typeface::CJK_Regular_JP);
+	FontAsset::Register(U"Game", FontMethod::MSDF, 48,
+						Typeface::CJK_Regular_JP);
+	FontAsset::Register(U"Menu", FontMethod::MSDF, 48, Typeface::Bold);
+	FontAsset::Register(U"HowToPlay", FontMethod::MSDF, 28, Typeface::Bold);
+	FontAsset::Register(U"Result", FontMethod::MSDF, 56, Typeface::Bold);
+	FontAsset::Register(U"Score", FontMethod::MSDF, 32);
+}
+
 }  // namespace
 
 void Main()
@@ -76,11 +94,13 @@ void Main()
 	Window::Resize(1280, 720);
 	Scene::SetBackground(ColorF{0.95});
 
+	// ゲームアセットを準備する
+
+	::InitializeGameAsset();
+
 	// 設定ロード
 	Config config;
 	config.load(U"config.json");
-
-	Font font{48, Typeface::Regular};
 
 	ProblemManager problemManager;
 	problemManager.loadFromJSON(U"problems.json");
@@ -89,7 +109,7 @@ void Main()
 	GameState state{problemManager.getProblems()};
 
 	// レンダラ／サウンド
-	Renderer renderer{config, font};
+	Renderer renderer{config, FontAsset(U"Game")};
 	SoundManager sound;
 	sound.loadAssets();
 
@@ -123,7 +143,7 @@ void Main()
 			// 遊び方オーバーレイ表示
 			if (showHowTo)
 			{
-				DrawHowToOverlay(font);
+				DrawHowToOverlay();
 
 				const RectF panel{140, 140, 1000, 440};
 				if (ClickedCloseOnHowTo(panel))
@@ -144,7 +164,7 @@ void Main()
 					continue;
 				}
 				current = std::make_unique<GameScene>(state, renderer, sound,
-													  config, font);
+													  config);
 				scene = SceneID::Game;
 				continue;
 			}

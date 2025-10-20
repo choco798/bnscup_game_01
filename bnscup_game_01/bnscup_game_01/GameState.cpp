@@ -19,6 +19,7 @@ void GameState::state_next()
 	else
 	{
 		// 末尾を超えた場合の扱いは外側の遷移ロジックに任せる
+		currentIndex = problems.size();
 		answered = false;
 	}
 }

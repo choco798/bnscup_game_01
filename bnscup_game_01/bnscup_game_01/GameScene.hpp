@@ -13,7 +13,6 @@ class GameScene : public SceneBase
 	Renderer& m_renderer;
 	SoundManager& m_sound;
 	Config& m_config;
-	Font m_font;
 
 	Array<LayoutChar> m_chars;
 	bool m_showExplanation = false;
@@ -24,7 +23,7 @@ class GameScene : public SceneBase
 
    public:
 	GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
-			  Config& config, Font& font);
+			  Config& config);
 	void startProblem();
 	void update() override;
 	void draw() const override;

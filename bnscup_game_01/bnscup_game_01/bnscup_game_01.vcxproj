@@ -338,6 +338,7 @@
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="GameScene.hpp" />
     <ClInclude Include="GameState.hpp" />
+    <ClInclude Include="Main.h" />
     <ClInclude Include="Problem.hpp" />
     <ClInclude Include="ProblemManager.hpp" />
     <ClInclude Include="Renderer.hpp" />
