@@ -22,7 +22,7 @@ void TitleScene::draw() const
 
 	Rect{Scene::Size()}.draw(ColorF{0.96});
 
-	normal_font(U"ブレバトの季語探しゲーム")
+	normal_font(U"ああ季語や")
 		.drawAt(Scene::Center().x, 160, Palette::Black);
 
 	RoundRect{Arg::center = Vec2{Scene::Center().x, 360}, 360, 72, 16}
