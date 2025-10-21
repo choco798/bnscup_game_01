@@ -23,7 +23,7 @@ void GameScene::startProblem()
 	}
 
 	const auto& ui = m_config.ui();
-	TextLayouter layouter{FontAsset(U"Game"), ui.maxLineWidth, ui.lineHeightScale, ui.lineWidthScale};
+	TextLayouter layouter{U"Game", ui.maxLineWidth, ui.lineHeightScale, ui.lineWidthScale};
 	m_chars = layouter.layout(m_state.problems[m_state.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
@@ -35,9 +35,12 @@ void GameScene::startProblem()
 	}
 }
 
-void GameScene::update()
+void GameScene::update(bool enable)
 {
-	handleClick();
+	if (enable)
+	{
+		handleClick();
+	}
 }
 
 void GameScene::draw() const
@@ -103,7 +106,7 @@ bool GameScene::isHitKigo() const
 
 	const auto& ui = m_config.ui();
 
-	for (int32 i = prob.kigoStart; i <= prob.kigoEnd; ++i)
+	for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
 	{
 		const RectF inflated =
 			Inflate(m_chars[i].box, ui.hitboxPaddingPx, ui.hitboxPaddingScale);

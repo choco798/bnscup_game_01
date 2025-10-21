@@ -3,8 +3,9 @@
 #include "Renderer.hpp"
 
 
-Renderer::Renderer(const Config& config, const Font& font)
-	: m_config(config), m_font{font},
+Renderer::Renderer(const Config& config, const String fontName)
+	: m_config(config),
+	  m_fontName{fontName},
 	  m_bg{Texture{U"Assets/images/bg_paper.png"}},
 	  m_teacherNormal{Texture{U"Assets/images/teacher_normal.png"}},
 	  m_teacherHappy{Texture{U"Assets/images/teacher_happy.png"}},
@@ -30,7 +31,7 @@ void Renderer::drawHaiku(const Array<LayoutChar>& chars) const
 {
 	for (const auto& c : chars)
 	{
-		m_font(String{1, c.ch}).draw(c.pos, Palette::Black);
+		FontAsset(m_fontName)(String{1, c.ch}).draw(c.pos, Palette::Black);
 	}
 }
 
@@ -64,5 +65,9 @@ void Renderer::drawExplanation(const String& text) const
 	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
 	panel.drawFrame(2, 0, Palette::Gray);
 
-	m_font(text).draw(panel.pos.movedBy(30, 16), Palette::Black);
+	String show_text = text;
+	show_text.replace(U"*", U"\n");
+
+	FontAsset(U"Explanation")(show_text).draw(panel.pos.movedBy(30, 16),
+											  Palette::Black);
 }

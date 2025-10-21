@@ -7,9 +7,10 @@ ResultScene::ResultScene(const GameState& state, Renderer& renderer,
 {
 }
 
-void ResultScene::update()
+void ResultScene::update(bool enable)
 {
 	// 外側の遷移コントローラでボタン判定を行う想定
+	(void)enable;
 }
 
 void ResultScene::draw() const

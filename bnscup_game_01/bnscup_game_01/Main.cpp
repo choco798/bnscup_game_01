@@ -11,7 +11,6 @@
 #include "SceneBase.hpp"
 #include "SoundManager.hpp"
 #include "TitleScene.hpp"
-#include "Main.h"
 
 enum class SceneID
 {
@@ -81,12 +80,21 @@ void InitializeGameAsset()
 						Typeface::CJK_Regular_JP);
 	FontAsset::Register(U"Game", FontMethod::MSDF, 48,
 						Typeface::CJK_Regular_JP);
+	FontAsset::Register(U"Explanation", FontMethod::MSDF, 30,
+						Typeface::CJK_Regular_JP);
 	FontAsset::Register(U"Menu", FontMethod::MSDF, 48, Typeface::Bold);
 	FontAsset::Register(U"HowToPlay", FontMethod::MSDF, 28, Typeface::Bold);
 	FontAsset::Register(U"Result", FontMethod::MSDF, 56, Typeface::Bold);
 	FontAsset::Register(U"Score", FontMethod::MSDF, 32);
+	FontAsset::Wait(U"Title");
+	FontAsset::Wait(U"TitleText");
+	FontAsset::Wait(U"Game");
+	FontAsset::Wait(U"Explanation");
+	FontAsset::Wait(U"Menu");
+	FontAsset::Wait(U"HowToPlay");
+	FontAsset::Wait(U"Result");
+	FontAsset::Wait(U"Score");
 }
-
 }  // namespace
 
 void Main()
@@ -109,7 +117,7 @@ void Main()
 	GameState state{problemManager.getProblems()};
 
 	// レンダラ／サウンド
-	Renderer renderer{config, FontAsset(U"Game")};
+	Renderer renderer{config, U"Game"};
 	SoundManager sound;
 	sound.loadAssets();
 
@@ -132,7 +140,7 @@ void Main()
 	while (System::Update())
 	{
 		// シーンごとの更新・描画
-		current->update();
+		current->update(!showHowTo);
 		current->draw();
 
 		//========================
@@ -140,21 +148,9 @@ void Main()
 		//========================
 		if (scene == SceneID::Title)
 		{
-			// 遊び方オーバーレイ表示
-			if (showHowTo)
-			{
-				DrawHowToOverlay();
-
-				const RectF panel{140, 140, 1000, 440};
-				if (ClickedCloseOnHowTo(panel))
-				{
-					showHowTo = false;
-				}
-				continue;
-			}
-
+			bool enable = !showHowTo;
 			// ボタンヒットテスト（簡易）
-			if (GetTitleStartRect().mouseOver() && MouseL.down())
+			if (enable && GetTitleStartRect().mouseOver() && MouseL.down())
 			{
 				// ゲーム開始
 				state.state_reset();
@@ -168,12 +164,12 @@ void Main()
 				scene = SceneID::Game;
 				continue;
 			}
-			if (GetTitleHowToRect().mouseOver() && MouseL.down())
+			if (enable && GetTitleHowToRect().mouseOver() && MouseL.down())
 			{
 				showHowTo = true;
 				continue;
 			}
-			if (GetTitleExitRect().mouseOver() && MouseL.down())
+			if (enable && GetTitleExitRect().mouseOver() && MouseL.down())
 			{
 				break;	// アプリ終了
 			}
@@ -209,12 +205,24 @@ void Main()
 			}
 		}
 
-		// デバッグ：F1 でヘルプ開閉
-		if (KeyF1.down())
+		if ((scene == SceneID::Title) || (scene == SceneID::Game))
 		{
-			if (scene == SceneID::Title)
+			// デバッグ：F3 でヘルプ開閉
+			if (KeyF3.down())
 			{
 				showHowTo = !showHowTo;
+			}
+			// 遊び方オーバーレイ表示
+			if (showHowTo)
+			{
+				DrawHowToOverlay();
+
+				const RectF panel{140, 140, 1000, 440};
+				if (ClickedCloseOnHowTo(panel))
+				{
+					showHowTo = false;
+				}
+				continue;
 			}
 		}
 	}

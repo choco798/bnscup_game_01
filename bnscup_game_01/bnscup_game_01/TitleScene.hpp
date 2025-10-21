@@ -7,7 +7,7 @@ class TitleScene : public SceneBase
 {
    public:
 	TitleScene(SoundManager& sound);
-	void update() override;
+	void update(bool enable) override;
 	void draw() const override;
 
 	private:

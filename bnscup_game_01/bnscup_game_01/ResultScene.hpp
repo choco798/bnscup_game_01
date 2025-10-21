@@ -15,6 +15,6 @@ class ResultScene : public SceneBase
    public:
 	ResultScene(const GameState& state, Renderer& renderer,
 				SoundManager& sound);
-	void update() override;
+	void update(bool enable) override;
 	void draw() const override;
 };

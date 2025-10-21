@@ -11,10 +11,11 @@ TitleScene::TitleScene(SoundManager& sound) : m_sound{sound}
 	small_font = Font{32};
 }
 
-void TitleScene::update()
+void TitleScene::update(bool enable)
 {
 	// ここでは UI のヒットテストは行わず、描画専任。
 	// シーン遷移は外側のコントローラで行う想定。
+	(void)enable;
 }
 
 void TitleScene::draw() const

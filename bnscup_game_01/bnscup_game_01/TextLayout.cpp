@@ -2,9 +2,9 @@
 
 #include "TextLayout.hpp"
 
-TextLayouter::TextLayouter(const Font& font, double maxWidth,
+TextLayouter::TextLayouter(const String fontName, double maxWidth,
 						   double lineHeightScale, double lineWidthScale)
-	: m_font{font},
+	: m_fontName{fontName},
 	  m_maxLineWidth{maxWidth},
 	  m_lineHeightScale{lineHeightScale},
 	  m_lineWidthScale{lineWidthScale}
@@ -17,9 +17,13 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 
 	double lineWidth = 0;
 
+	const Font& localFont = FontAsset(m_fontName);
+
 	for (size_t i = 0; i < text.size(); ++i)
 	{
-		lineWidth = Max(lineWidth,m_font.getGlyph(text[i]).xAdvance * m_lineWidthScale);
+		lineWidth = Max(
+			lineWidth, localFont.getGlyph(text[i]).xAdvance *
+							   m_lineWidthScale);
 	}
 
 	double text_x = 0.0;
@@ -35,11 +39,11 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	{
 		for (const char32 ch : word)
 		{
-			const auto gi = m_font.getGlyph(ch);
+			const auto gi = localFont.getGlyph(ch);
 			RectF box{Arg::topLeft = Vec2{text_x, text_y}, gi.xAdvance,
-					  static_cast<double>(m_font.height())};
+					  static_cast<double>(localFont.height())};
 			out << LayoutChar{ch, Vec2{text_x, text_y}, box, index++};
-			text_y += static_cast<double>(m_font.height());
+			text_y += static_cast<double>(localFont.height());
 		}
 	};
 
@@ -68,8 +72,8 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		}
 
 		// 次の単語＋このスペースを載せられるか？（見積り）
-		const double wordW = m_font(token).region().w;
-		const double spaceW = m_font(U" ").region().w;
+		//const double wordW = m_font(token).region().w;
+		//const double spaceW = m_font(U" ").region().w;
 
 		const bool needBreak = true;
 
@@ -90,11 +94,11 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 
 		// スペースを 1 文字として位置進行（可視描画しないが矩形は持つ）
 		{
-			const auto gi = m_font.getGlyph(U' ');
+			const auto gi = localFont.getGlyph(U' ');
 			RectF box{Arg::topLeft = Vec2{text_x, text_y}, gi.xAdvance,
-					  static_cast<double>(m_font.height())};
+					  static_cast<double>(localFont.height())};
 			out << LayoutChar{U' ', Vec2{text_x, text_y}, box, index++};
-			text_y += static_cast<double>(m_font.height());
+			text_y += static_cast<double>(localFont.height());
 		}
 
 		// 改行候補に登録
@@ -105,7 +109,7 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	if (!token.isEmpty())
 	{
 
-		const double wordW = m_font(token).region().w;
+		//const double wordW = m_font(token).region().w;
 		const bool needBreak = true;
 		// 長さで改行をするか決める場合はこちらを利用する
 		// (x + wordW) > m_maxLineWidth && !breakablePositions.isEmpty()
@@ -122,9 +126,9 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	// 最終的に各 glyph の advance から box を更新（必要なら）
 	for (auto& lc : out)
 	{
-		const auto gi = m_font.getGlyph(lc.ch);
+		const auto gi = localFont.getGlyph(lc.ch);
 		lc.box = RectF{Arg::topLeft = lc.pos, gi.xAdvance,
-					   static_cast<double>(m_font.height())};
+					   static_cast<double>(localFont.height())};
 	}
 
 	return out;

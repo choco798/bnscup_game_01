@@ -25,7 +25,7 @@ class GameScene : public SceneBase
 	GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
 			  Config& config);
 	void startProblem();
-	void update() override;
+	void update(bool enable) override;
 	void draw() const override;
 	static RectF Inflate(const RectF& r, double padPx, double padScale);
 };

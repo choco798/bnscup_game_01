@@ -11,11 +11,11 @@ class Renderer
 	Texture m_teacherNormal;
 	Texture m_teacherHappy;
 	Texture m_teacherAngry;
-	const Font& m_font;
+	const String m_fontName;
 	const Config& m_config;
 
    public:
-	Renderer(const Config& config, const Font& font);
+	Renderer(const Config& config, const String fontName);
 	void drawBackground() const;
 	void drawHaiku(const Array<LayoutChar>& chars) const;
 	void drawTeacherNormal() const;
