@@ -61,8 +61,7 @@ void DrawHowToOverlay()
 		.draw(Palette::White)
 		.drawFrame(3, 0, Palette::Black);
 	FontAsset(U"HowToPlay")(U"閉じる").drawAt(
-		panel.x + panel.w - 120, panel.y + panel.h - 44,
-						   Palette::Black);
+		panel.x + panel.w - 120, panel.y + panel.h - 44, Palette::Black);
 }
 
 bool ClickedCloseOnHowTo(const RectF& panel)
@@ -99,9 +98,6 @@ void InitializeGameAsset()
 
 void Main()
 {
-	Window::Resize(1280, 720);
-	Scene::SetBackground(ColorF{0.95});
-
 	// ゲームアセットを準備する
 
 	::InitializeGameAsset();
@@ -109,6 +105,9 @@ void Main()
 	// 設定ロード
 	Config config;
 	config.load(U"config.json");
+
+	Window::Resize(static_cast<int32_t>(config.ui().clientSize), 720);
+	Scene::SetBackground(ColorF{0.95});
 
 	ProblemManager problemManager;
 	problemManager.loadFromJSON(U"problems.json");
@@ -122,7 +121,7 @@ void Main()
 	sound.loadAssets();
 
 	SceneID scene = SceneID::Title;
-	std::unique_ptr<SceneBase> current = std::make_unique<TitleScene>(sound);
+	std::unique_ptr<SceneBase> current = std::make_unique<TitleScene>(sound, state.currentRankName(), config);
 
 	// 問題ロード
 	if (!problemManager.loadFromJSON(U"problems.json"))
@@ -132,7 +131,6 @@ void Main()
 			U"を確認してください。");
 	}
 	state.problems = problemManager.getProblems();
-
 
 	// ヘルプ（遊び方）オーバーレイの状態
 	bool showHowTo = false;
@@ -159,8 +157,8 @@ void Main()
 					System::MessageBoxOK(U"出題できる問題がありません。");
 					continue;
 				}
-				current = std::make_unique<GameScene>(state, renderer, sound,
-													  config);
+				current =
+					std::make_unique<GameScene>(state, renderer, sound, config);
 				scene = SceneID::Game;
 				continue;
 			}
@@ -199,7 +197,8 @@ void Main()
 			const RectF backBtn{780, 470, 260, 56};
 			if (backBtn.mouseOver() && MouseL.down())
 			{
-				current = std::make_unique<TitleScene>(sound);
+				current = std::make_unique<TitleScene>(
+					sound, state.currentRankName(), config);
 				scene = SceneID::Title;
 				continue;
 			}

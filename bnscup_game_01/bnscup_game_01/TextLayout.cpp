@@ -3,11 +3,13 @@
 #include "TextLayout.hpp"
 
 TextLayouter::TextLayouter(const String fontName, double maxWidth,
-						   double lineHeightScale, double lineWidthScale)
+						   double lineHeightScale, double lineWidthScale,
+						   double clientSize)
 	: m_fontName{fontName},
 	  m_maxLineWidth{maxWidth},
 	  m_lineHeightScale{lineHeightScale},
-	  m_lineWidthScale{lineWidthScale}
+	  m_lineWidthScale{lineWidthScale},
+	  m_clientSize{clientSize}
 {
 }
 
@@ -22,13 +24,13 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	for (size_t i = 0; i < text.size(); ++i)
 	{
 		lineWidth = Max(
-			lineWidth, localFont.getGlyph(text[i]).xAdvance *
-							   m_lineWidthScale);
+			lineWidth, localFont.getGlyph(text[i]).xAdvance * m_lineWidthScale);
 	}
 
 	double text_x = 0.0;
 	double text_y = 0.0;
 	int32 index = 0;
+	int32 lineCount = 0;
 
 	String token;
 
@@ -56,9 +58,10 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		{
 			flushWord(token);
 			token.clear();
-			text_y = 0.0;
-			text_x += lineWidth;
-			breakablePositions.clear();
+
+			InsertBreakInText(text_y, text_x, lineWidth,
+							  static_cast<double>(localFont.height()),
+							  lineCount,breakablePositions);
 			continue;
 		}
 
@@ -72,25 +75,24 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		}
 
 		// 次の単語＋このスペースを載せられるか？（見積り）
-		//const double wordW = m_font(token).region().w;
-		//const double spaceW = m_font(U" ").region().w;
-
-		const bool needBreak = true;
-
-		// 長さで改行をするか決める場合はこちらを利用する
-		// (x + wordW + spaceW) > m_maxLineWidth && !breakablePositions.isEmpty();
-
-		if (needBreak)
-		{
-			// 直前のスペースで改行
-			text_y = 0.0;
-			text_x += lineWidth;
-			breakablePositions.clear();
-		}
+		// const double wordW = m_font(token).region().w;
+		// const double spaceW = m_font(U" ").region().w;
 
 		// 単語出力
 		flushWord(token);
 		token.clear();
+
+		const bool needBreak = true;
+		// 長さで改行をするか決める場合はこちらを利用する
+		// (x + wordW + spaceW) > m_maxLineWidth &&
+		// !breakablePositions.isEmpty();
+		if (needBreak)
+		{
+			// 直前のスペースで改行
+			InsertBreakInText(text_y, text_x, lineWidth,
+							  static_cast<double>(localFont.height()),
+							  lineCount, breakablePositions);
+		}
 
 		// スペースを 1 文字として位置進行（可視描画しないが矩形は持つ）
 		{
@@ -108,17 +110,6 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	// 残りの単語を吐き出し
 	if (!token.isEmpty())
 	{
-
-		//const double wordW = m_font(token).region().w;
-		const bool needBreak = true;
-		// 長さで改行をするか決める場合はこちらを利用する
-		// (x + wordW) > m_maxLineWidth && !breakablePositions.isEmpty()
-		if (needBreak)
-		{
-			text_y = 0.0;
-			text_x += lineWidth;
-			breakablePositions.clear();
-		}
 		flushWord(token);
 		token.clear();
 	}
@@ -132,4 +123,15 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	}
 
 	return out;
+}
+
+void TextLayouter::InsertBreakInText(
+	double& text_y, double& text_x, double lineWidth, double localFontY,
+	int32_t& lineCount, s3d::Array<size_t>& breakablePositions) const
+{
+	// 改行処理
+	text_y = localFontY * lineCount * 0.5f;
+	text_x -= lineWidth;
+	breakablePositions.clear();
+	++lineCount;
 }

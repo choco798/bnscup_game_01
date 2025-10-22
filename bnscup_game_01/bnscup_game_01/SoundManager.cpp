@@ -2,9 +2,9 @@
 
 #include "SoundManager.hpp"
 
-	void SoundManager::loadAssets()
+void SoundManager::loadAssets()
 {
-	m_bgm = Audio{U"elegant_loop.ogg", Loop::Yes};
+	m_bgm = Audio{U"op01.mp3", Loop::Yes};
 	m_seCorrect = Audio{U"correct.wav"};
 	m_seWrong = Audio{U"wrong.wav"};
 }
@@ -13,6 +13,7 @@ void SoundManager::playBGM()
 {
 	if (m_bgm && !m_bgm.isPlaying())
 	{
+		m_bgm.setVolume(m_bgmVolume);
 		m_bgm.play();
 	}
 }
@@ -29,7 +30,7 @@ void SoundManager::playCorrect()
 {
 	if (m_seCorrect)
 	{
-		m_seCorrect.playOneShot();
+		m_seCorrect.playOneShot(m_seVolume);
 	}
 }
 
@@ -37,6 +38,27 @@ void SoundManager::playWrong()
 {
 	if (m_seWrong)
 	{
-		m_seWrong.playOneShot();
+		m_seWrong.playOneShot(m_seVolume);
 	}
+}
+
+void SoundManager::setBgmVolume(double v)
+{
+	m_bgmVolume = Clamp(v, 0.0, 1.0);
+	if (m_bgm)
+	{
+		m_bgm.setVolume(m_bgmVolume);
+	}
+}
+void SoundManager::setSeVolume(double v)
+{
+	m_seVolume = Clamp(v, 0.0, 1.0);
+}
+double SoundManager::getBgmVolume() const noexcept
+{
+	return m_bgmVolume;
+}
+double SoundManager::getSeVolume() const noexcept
+{
+	return m_seVolume;
 }

@@ -9,6 +9,7 @@ GameScene::GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
 	  m_sound{sound},
 	  m_config{config}
 {
+	m_sound.stopBGM();
 	startProblem();
 }
 
@@ -23,11 +24,11 @@ void GameScene::startProblem()
 	}
 
 	const auto& ui = m_config.ui();
-	TextLayouter layouter{U"Game", ui.maxLineWidth, ui.lineHeightScale, ui.lineWidthScale};
+	TextLayouter layouter{U"Game", ui.maxLineWidth, ui.lineHeightScale, ui.lineWidthScale, ui.clientSize};
 	m_chars = layouter.layout(m_state.problems[m_state.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
-	const Vec2 base{80, 120};
+	const Vec2 base{ui.clientSize / 2, 60};
 	for (auto& c : m_chars)
 	{
 		c.pos += base;
@@ -53,7 +54,11 @@ void GameScene::draw() const
 			.drawAt(Scene::Center(), Palette::Black);
 		return;
 	}
-
+	if (m_showExplanation)
+	{
+		// 季語をハイライトする
+		drawKigoRect();
+	}
 	// 俳句本文
 	m_renderer.drawHaiku(m_chars);
 
@@ -87,6 +92,29 @@ void GameScene::draw() const
 	{
 		m_renderer.drawExplanation(
 			m_state.problems[m_state.currentIndex].explanation);
+
+	}
+}
+
+void GameScene::drawKigoRect() const
+{
+	const auto& prob = m_state.problems[m_state.currentIndex];
+	if (prob.hasKigo)
+	{
+		const auto& ui = m_config.ui();
+		for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
+		{
+			const bool isSpace =
+				(m_chars[i].ch == U' ' || m_chars[i].ch == U'　');
+			if (isSpace)
+			{
+				continue;
+			}
+
+			const RectF inflated = Inflate(m_chars[i].box, ui.hitboxPaddingPx,
+										   ui.hitboxPaddingScale);
+			inflated.draw(Palette::White);
+		}
 	}
 }
 

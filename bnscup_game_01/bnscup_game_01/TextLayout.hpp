@@ -16,9 +16,13 @@ class TextLayouter
 	double m_maxLineWidth;
 	double m_lineHeightScale;
 	double m_lineWidthScale;
+	double m_clientSize;
 
    public:
 	TextLayouter(const String fontName, double maxWidth, double lineHeightScale,
-				 double lineWidthScale);
-	Array<LayoutChar> layout(const String& text) const;
+				 double lineWidthScale, double clientSize);
+	Array<LayoutChar> layout(const String &text) const;
+
+	void InsertBreakInText(double &text_y, double &text_x, double lineWidth, double localFontY, int32_t& lineCount,
+						   s3d::Array<size_t> &breakablePositions) const;
 };

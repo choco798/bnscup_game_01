@@ -27,5 +27,6 @@ class GameScene : public SceneBase
 	void startProblem();
 	void update(bool enable) override;
 	void draw() const override;
+	void drawKigoRect() const;
 	static RectF Inflate(const RectF& r, double padPx, double padScale);
 };

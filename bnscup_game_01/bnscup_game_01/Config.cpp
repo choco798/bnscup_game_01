@@ -22,10 +22,21 @@ bool Config::load(const FilePath& path)
 		m_ui.hitboxPaddingScale =
 			ui[U"hitboxPaddingScale"].getOr<double>(m_ui.hitboxPaddingScale);
 	}
+
+	if (const auto au = json[U"audio"])
+	{
+		m_audio.bgmVolume = au[U"bgmVolume"].getOr<double>(m_audio.bgmVolume);
+		m_audio.seVolume = au[U"seVolume"].getOr<double>(m_audio.seVolume);
+	}
 	return true;
 }
 
 const UIConfig& Config::ui() const noexcept
 {
 	return m_ui;
+}
+
+const AudioConfig& Config::audio() const noexcept
+{
+	return m_audio;
 }
