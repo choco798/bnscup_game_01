@@ -361,12 +361,12 @@ void GameScene::handleClick()
 		return;
 	}
 
+	auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
+
 	if (!MouseL.down())
 	{
 		return;
 	}
-
-	auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
 
 	// 季語ヒット
 	if (isHitKigo())
@@ -385,21 +385,19 @@ void GameScene::handleClick()
 	}
 
 	// 季語なしボタンの簡易チェック
+	if (m_noKigoBtn.roundRect().mouseOver())
 	{
-		if (m_noKigoBtn.isClicked())
+		getData().gameState.answered = true;
+		m_result = (!prob.hasKigo);
+		if (m_result)
 		{
-			getData().gameState.answered = true;
-			m_result = (!prob.hasKigo);
-			if (m_result)
-			{
-				ExecCorrect();
-			}
-			else
-			{
-				ExecWrong();
-			}
-			return;
+			ExecCorrect();
 		}
+		else
+		{
+			ExecWrong();
+		}
+		return;
 	}
 
 	// 解説表示中にクリックで次の問題へ
@@ -410,6 +408,7 @@ void GameScene::handleClick()
 	}
 	else
 	{
+		// 何もないところをクリックすると間違い扱いにする
 		ExecWrong();
 	}
 }
