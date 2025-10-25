@@ -137,7 +137,7 @@ void TitleScene::draw() const
 
 	// 著作権表示
 	FontAsset(U"Copyright")(
-		U"Copyright\nプログラム・サウンド: Nasatame \nプログラム・イラスト: moqueca "
+		U"Version 0.5  2025/10/25\nCopyright\nプログラム・サウンド: Nasatame \nプログラム・イラスト: moqueca "
 		U"\n音楽：TAM Music Factory")
-		.draw(Scene::Rect().leftCenter() + Vec2(50, 250), Palette::Black);
+		.draw(Scene::Rect().leftCenter() + Vec2(50, 200), Palette::Black);
 }
