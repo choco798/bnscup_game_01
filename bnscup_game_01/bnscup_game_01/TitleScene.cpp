@@ -134,4 +134,10 @@ void TitleScene::draw() const
 		bgmKnob.draw(Palette::White).drawFrame(2, 0, Palette::Black);
 		seKnob.draw(Palette::White).drawFrame(2, 0, Palette::Black);
 	}
+
+	// 著作権表示
+	FontAsset(U"Copyright")(
+		U"Copyright\nプログラム・サウンド: Nasatame \nプログラム・イラスト: moqueca "
+		U"\n音楽：TAM Music Factory")
+		.draw(Scene::Rect().leftCenter() + Vec2(50, 250), Palette::Black);
 }

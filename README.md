@@ -1,3 +1,5 @@
 # bnscup_game_01
 
-テストです
+プログラム・サウンド: [moqueca]
+プログラム・イラスト: Nasatame [Nasatame.icon]
+音楽：TAM Music Factory

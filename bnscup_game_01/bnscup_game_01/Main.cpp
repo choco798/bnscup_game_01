@@ -45,6 +45,7 @@ void InitializeGameAsset()
 	FontAsset::Register(U"HowToPlay", FontMethod::MSDF, 28, Typeface::Bold);
 	FontAsset::Register(U"Result", FontMethod::MSDF, 56, Typeface::Bold);
 	FontAsset::Register(U"Score", FontMethod::MSDF, 32);
+	FontAsset::Register(U"Copyright", FontMethod::MSDF, 16);
 	FontAsset::Wait(U"Title");
 	FontAsset::Wait(U"TitleText");
 	FontAsset::Wait(U"Game");
@@ -53,6 +54,7 @@ void InitializeGameAsset()
 	FontAsset::Wait(U"HowToPlay");
 	FontAsset::Wait(U"Result");
 	FontAsset::Wait(U"Score");
+	FontAsset::Wait(U"Copyright");
 }
 }  // namespace
 
