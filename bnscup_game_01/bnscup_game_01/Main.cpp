@@ -49,12 +49,8 @@ void DrawHowToOverlay()
 		.draw(160, 220, Palette::Black);
 	FontAsset(U"HowToPlay")(U"・季語が無い句は「季語なし」をクリックします。")
 		.draw(160, 260, Palette::Black);
-	FontAsset(U"HowToPlay")(U"・正解で +10 点。解説が表示されます。")
+	FontAsset(U"HowToPlay")(U"・正解で点数が追加。解説が表示されます。")
 		.draw(160, 300, Palette::Black);
-	FontAsset(U"HowToPlay")(U"・本バージョンでは問題順はファイル順です。")
-		.draw(160, 340, Palette::Black);
-	FontAsset(U"HowToPlay")(U"・スコアは実行中のみ保持されます。")
-		.draw(160, 380, Palette::Black);
 
 	s3d::RoundRect{
 		RectF{panel.x + panel.w - 200, panel.y + panel.h - 68, 160, 48}, 12}
@@ -106,7 +102,7 @@ void Main()
 	Config config;
 	config.load(U"config.json");
 
-	Window::Resize(static_cast<int32_t>(config.ui().clientSize), 720);
+	Window::Resize(config.ui().clientSizeX, config.ui().clientSizeY);
 	Scene::SetBackground(ColorF{0.95});
 
 	ProblemManager problemManager;

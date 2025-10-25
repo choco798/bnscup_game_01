@@ -8,7 +8,8 @@ struct UIConfig
 	double hitboxPaddingPx = 6.0;
 	double hitboxPaddingScale = 0.1;
 	int32_t wordWidth = 80;
-	double clientSize = 1280;
+	int32_t clientSizeX = 1280;
+	int32_t clientSizeY = 720;
 };
 
 // AudioConfig 構造体とアクセサ
