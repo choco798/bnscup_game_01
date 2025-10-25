@@ -57,9 +57,9 @@ void DrawFlowHintPastel(const RectF& area, Vec2 dir, double t01,
 	const double swirlFreq = 6.28318;  // 横揺れの周波数（2π）
 	const double trailLength = 26.0;   // 軌跡の長さ
 	const double alphaBase =
-		(t01 < 0.1)
-			? t01 * 10 * 0.26
-			: ((0.9 < t01) ? (1 - t01) * 10 * 0.26 : 0.26);  // 粒子の基本アルファ（やわらかく）
+		(t01 < 0.1) ? t01 * 10 * 0.26
+					: ((0.9 < t01) ? (1 - t01) * 10 * 0.26
+								   : 0.26);	 // 粒子の基本アルファ（やわらかく）
 	const double satMin = 0.28, satMax = 0.45;	// パステル彩度
 	const double valMin = 0.95, valMax = 1.00;	// パステル明度
 
@@ -118,18 +118,21 @@ void DrawFlowHintPastel(const RectF& area, Vec2 dir, double t01,
 
 		// 軌跡（やわらかい流れ方向のヒント）
 		const Vec2 tail = p - nDir * trailLength;
-		//Line{tail, p}.draw(2.0, col);
+		// Line{tail, p}.draw(2.0, col);
 		Circle{p, size}.draw(col);
 	}
 }
 
-// クラス定義
-GameScene::GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
-					 Config& config)
-	: m_state{state}, m_renderer{renderer}, m_sound{sound}, m_config{config}
+
+////////////////////////
+// ここからGameScene
+////////////////////////
+GameScene::GameScene(const InitData& init) : IScene(init)
 {
-	m_sound.stopBGM();
+	getData().sound.stopBGM();
 	startProblem();
+
+	m_noKigoBtn = ui::Button(U"季語なし", U"Game", Vec2(960, 140));
 }
 
 void GameScene::startProblem()
@@ -137,15 +140,16 @@ void GameScene::startProblem()
 	m_showExplanation = false;
 	m_result = false;
 
-	if (m_state.currentIndex >= m_state.problems.size())
+	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
 	{
 		return;
 	}
 
-	const auto& ui = m_config.ui();
+	const auto& ui = getData().config.ui();
 	TextLayouter layouter{U"Game", ui.maxLineWidth, ui.lineHeightScale,
-						  ui.lineWidthScale, static_cast<double>(ui.clientSizeX)};
-	m_chars = layouter.layout(m_state.problems[m_state.currentIndex].text);
+						  ui.lineWidthScale,
+						  static_cast<double>(ui.clientSizeX)};
+	m_chars = layouter.layout(getData().gameState.problems[getData().gameState.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
 	const Vec2 base{ui.clientSizeX / 2, 60};
@@ -156,32 +160,46 @@ void GameScene::startProblem()
 	}
 }
 
-void GameScene::update(bool enable)
+void GameScene::update()
 {
-	if (enable)
-	{
-		handleClick();
-	}
 	// ミスクリック時に方向を示す
 	if (m_flowTime > 0.0f)
 	{
 		m_flowTime -= Scene::DeltaTime() / 3.0f;
 	}
+	m_noKigoBtn.update();
+
+	const bool disableInput = getData().showHowToPlay;
+	if (disableInput)
+	{
+		return;
+	}
+
+	handleClick();
+	// GameScene 内部で問題を進め、末尾まで到達したら結果へ
+	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
+	{
+		changeScene(State::Result);
+		return;
+	}
 }
 
 void GameScene::draw() const
 {
-	Reseed(m_state.currentIndex);
+	Reseed(getData().gameState.currentIndex);
 
-	m_renderer.drawBackground();
+	getData().renderer.drawBackground();
 
-	if (m_state.currentIndex >= m_state.problems.size())
+	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
 	{
-		FontAsset(U"Game")(U"問題がありません")
-			.drawAt(Scene::Center(), Palette::Black);
+		FontAsset(U"Game")(U"終了！").drawAt(Scene::Center(), Palette::Black);
 		return;
 	}
-	if (m_showExplanation)
+
+	// チュートリアルに関しては特別扱い
+	const bool isTutorial = (getData().gameState.currentIndex == 0);
+
+	if (m_showExplanation || isTutorial)
 	{
 		// 季語をハイライトする
 		drawKigoRect();
@@ -196,52 +214,57 @@ void GameScene::draw() const
 	if (m_flowTime > 0.0f)
 	{
 		DrawFlowHintPastel(
-			RectF(m_config.ui().clientSizeX, m_config.ui().clientSizeY),
-						   (m_flowStartPos - getKigoRectCenter()), m_flowTime);
+			RectF(getData().config.ui().clientSizeX, getData().config.ui().clientSizeY),
+			(m_flowStartPos - getKigoRectCenter()), m_flowTime);
 	}
 
 	// 俳句本文
-	m_renderer.drawHaiku(m_chars);
+	getData().renderer.drawHaiku(m_chars);
 
 	// 季語なしボタン（簡易）
-	{
-		const RoundRect btn{RectF{960, 140, 240, 60}, 16};
-		btn.draw(Palette::White).drawFrame(3, 0, Palette::Black);
-		FontAsset(U"Game")(U"季語なし")
-			.drawAt(btn.rect.center(), Palette::Black);
-	}
+	m_noKigoBtn.draw();
 
 	// 先生リアクション
-	if (!m_state.answered)
+	if (!getData().gameState.answered)
 	{
-		m_renderer.drawTeacherNormal();
+		getData().renderer.drawTeacherNormal();
 	}
 	else
 	{
 		if (m_result)
 		{
-			m_renderer.drawTeacherHappy();
+			getData().renderer.drawTeacherHappy();
 		}
 		else
 		{
-			m_renderer.drawTeacherAngry();
+			getData().renderer.drawTeacherAngry();
 		}
 	}
 
 	// 解説
 	if (m_showExplanation)
 	{
-		m_renderer.drawExplanation(
-			m_state.problems[m_state.currentIndex].explanation);
+		getData().renderer.drawExplanation(
+			getData().gameState.problems[getData().gameState.currentIndex].explanation);
+	}
+	else
+	{
+		// チュートリアルテキスト
+		if (isTutorial)
+		{
+			getData().renderer.drawTutorial(
+				U"俳句の中の季語を見つけていく（クリックする）ゲームです。\n言"
+				U"葉の芯を楽しんでください！！！");
+		}
 	}
 }
 
 void GameScene::drawKigoRect() const
 {
-	const auto& prob = m_state.problems[m_state.currentIndex];
+	const auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
 	if (prob.hasKigo)
 	{
-		const auto& ui = m_config.ui();
+		const auto& ui = getData().config.ui();
 		for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
 		{
 			drawWordRect(i, ui);
@@ -251,7 +274,7 @@ void GameScene::drawKigoRect() const
 
 void GameScene::drawHiakuRect() const
 {
-	const auto& ui = m_config.ui();
+	const auto& ui = getData().config.ui();
 	for (int32 i = 0; i < m_chars.size(); ++i)
 	{
 		drawWordRect(i, ui);
@@ -275,16 +298,15 @@ void GameScene::drawWordRect(s3d::int32 i, const UIConfig& ui) const
 	DrawRadialFadeCircle(rectCenter, ColorF(GeneratePastelColor(), 0.5));
 }
 
-
 Vec2 GameScene::getKigoRectCenter() const
 {
 	Vec2 result{};
 	int rectCount{};
 
-	const auto& prob = m_state.problems[m_state.currentIndex];
+	const auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
 	if (prob.hasKigo)
 	{
-		const auto& ui = m_config.ui();
+		const auto& ui = getData().config.ui();
 		for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
 		{
 			const bool isSpace =
@@ -312,13 +334,13 @@ RectF GameScene::Inflate(const RectF& r, double padPx, double padScale)
 
 bool GameScene::isHitKigo() const
 {
-	const auto& prob = m_state.problems[m_state.currentIndex];
+	const auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
 	if (!prob.hasKigo)
 	{
 		return false;
 	}
 
-	const auto& ui = m_config.ui();
+	const auto& ui = getData().config.ui();
 
 	for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
 	{
@@ -334,7 +356,7 @@ bool GameScene::isHitKigo() const
 
 void GameScene::handleClick()
 {
-	if (m_state.currentIndex >= m_state.problems.size())
+	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
 	{
 		return;
 	}
@@ -344,12 +366,12 @@ void GameScene::handleClick()
 		return;
 	}
 
-	auto& prob = m_state.problems[m_state.currentIndex];
+	auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
 
 	// 季語ヒット
 	if (isHitKigo())
 	{
-		m_state.answered = true;
+		getData().gameState.answered = true;
 		m_result = prob.hasKigo;  // hasKigo=true のときだけここに来る設計
 		if (m_result)
 		{
@@ -364,10 +386,9 @@ void GameScene::handleClick()
 
 	// 季語なしボタンの簡易チェック
 	{
-		const RectF btn{960, 140, 240, 60};
-		if (btn.mouseOver())
+		if (m_noKigoBtn.isClicked())
 		{
-			m_state.answered = true;
+			getData().gameState.answered = true;
 			m_result = (!prob.hasKigo);
 			if (m_result)
 			{
@@ -382,9 +403,9 @@ void GameScene::handleClick()
 	}
 
 	// 解説表示中にクリックで次の問題へ
-	if (m_state.answered && m_showExplanation)
+	if (getData().gameState.answered && m_showExplanation)
 	{
-		m_state.state_next();
+		getData().gameState.state_next();
 		startProblem();
 	}
 	else
@@ -395,15 +416,15 @@ void GameScene::handleClick()
 
 void GameScene::ExecWrong()
 {
-	m_sound.playWrong();
+	getData().sound.playWrong();
 	m_flowTime = 1.0f;
 	m_flowStartPos = Cursor::Pos();
 }
 
 void GameScene::ExecCorrect()
 {
-	m_sound.playCorrect();
-	m_state.score += 10;
-	m_state.correctCount += 1;
+	getData().sound.playCorrect();
+	getData().gameState.score += 10;
+	getData().gameState.correctCount += 1;
 	m_showExplanation = true;
 }

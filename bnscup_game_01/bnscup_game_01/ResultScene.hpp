@@ -4,17 +4,15 @@
 #include "Renderer.hpp"
 #include "SoundManager.hpp"
 #include "SceneBase.hpp"
+#include "UiButton.hpp"
 
-class ResultScene : public SceneBase
+class ResultScene : public KigoGameApp::Scene
 {
    private:
-	const GameState& m_state;
-	Renderer& m_renderer;
-	SoundManager& m_sound;
+	ui::Button m_backBtn{};
 
    public:
-	ResultScene(const GameState& state, Renderer& renderer,
-				SoundManager& sound);
-	void update(bool enable) override;
+	ResultScene(const InitData& data);
+	void update() override;
 	void draw() const override;
 };

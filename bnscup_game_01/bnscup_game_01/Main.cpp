@@ -11,6 +11,8 @@
 #include "SceneBase.hpp"
 #include "SoundManager.hpp"
 #include "TitleScene.hpp"
+#include "UiButton.hpp"
+#include "HowToPlay.hpp"
 
 enum class SceneID
 {
@@ -21,44 +23,6 @@ enum class SceneID
 
 namespace
 {
-// タイトル画面のボタン矩形（TitleScene の描画と揃える）
-RectF GetTitleStartRect()
-{
-	return RectF{Arg::center = Vec2{Scene::Center().x, 360}, 360, 72};
-}
-
-RectF GetTitleHowToRect()
-{
-	return RectF{Arg::center = Vec2{Scene::Center().x, 460}, 360, 72};
-}
-
-RectF GetTitleExitRect()
-{
-	return RectF{Arg::center = Vec2{Scene::Center().x, 560}, 360, 72};
-}
-
-// 簡易ヘルプ表示
-void DrawHowToOverlay()
-{
-	const RectF panel{140, 140, 1000, 440};
-	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.96});
-	panel.drawFrame(3, 0, Palette::Black);
-	FontAsset(U"Game")(U"あそびかた").draw(160, 160, Palette::Black);
-
-	FontAsset(U"HowToPlay")(U"・俳句の中の季語の文字をクリックします。")
-		.draw(160, 220, Palette::Black);
-	FontAsset(U"HowToPlay")(U"・季語が無い句は「季語なし」をクリックします。")
-		.draw(160, 260, Palette::Black);
-	FontAsset(U"HowToPlay")(U"・正解で点数が追加。解説が表示されます。")
-		.draw(160, 300, Palette::Black);
-
-	s3d::RoundRect{
-		RectF{panel.x + panel.w - 200, panel.y + panel.h - 68, 160, 48}, 12}
-		.draw(Palette::White)
-		.drawFrame(3, 0, Palette::Black);
-	FontAsset(U"HowToPlay")(U"閉じる").drawAt(
-		panel.x + panel.w - 120, panel.y + panel.h - 44, Palette::Black);
-}
 
 bool ClickedCloseOnHowTo(const RectF& panel)
 {
@@ -95,7 +59,6 @@ void InitializeGameAsset()
 void Main()
 {
 	// ゲームアセットを準備する
-
 	::InitializeGameAsset();
 
 	// 設定ロード
@@ -105,117 +68,60 @@ void Main()
 	Window::Resize(config.ui().clientSizeX, config.ui().clientSizeY);
 	Scene::SetBackground(ColorF{0.95});
 
-	ProblemManager problemManager;
-	problemManager.loadFromJSON(U"problems.json");
-
-	// ゲーム状態
-	GameState state{problemManager.getProblems()};
-
-	// レンダラ／サウンド
-	Renderer renderer{config, U"Game"};
-	SoundManager sound;
-	sound.loadAssets();
-
-	SceneID scene = SceneID::Title;
-	std::unique_ptr<SceneBase> current = std::make_unique<TitleScene>(sound, state.currentRankName(), config);
+	const RectF panel{140, 140, 1000, 440};
+	ui::Button closeHowToBtn{U"　閉じる　", U"HowToPlay",
+						Vec2{panel.x + panel.w - 120, panel.y + panel.h - 44}};
 
 	// 問題ロード
+	ProblemManager problemManager;
 	if (!problemManager.loadFromJSON(U"problems.json"))
 	{
 		System::MessageBoxOK(
 			U"問題ファイルの読み込みに失敗しました。\nAssets/problems.json "
 			U"を確認してください。");
 	}
-	state.problems = problemManager.getProblems();
 
-	// ヘルプ（遊び方）オーバーレイの状態
-	bool showHowTo = false;
+	// シーン管理
+	KigoGameApp manager;
+
+	if (manager.get())
+	{
+		manager.get()->sound.loadAssets();
+		manager.get()->gameState = GameState{problemManager.getProblems()};
+		manager.get()->renderer.initRenderer(U"Game");
+	}
+
+	manager.add<TitleScene>(State::Title);
+	manager.add<GameScene>(State::Game);
+	manager.add<ResultScene>(State::Result);
+
+	manager.init(State::Title);
+
 
 	while (System::Update())
 	{
-		// シーンごとの更新・描画
-		current->update(!showHowTo);
-		current->draw();
-
-		//========================
-		//  タイトル → 遷移制御
-		//========================
-		if (scene == SceneID::Title)
+		if (not manager.update())
 		{
-			bool enable = !showHowTo;
-			// ボタンヒットテスト（簡易）
-			if (enable && GetTitleStartRect().mouseOver() && MouseL.down())
-			{
-				// ゲーム開始
-				state.state_reset();
-				if (state.problems.isEmpty())
-				{
-					System::MessageBoxOK(U"出題できる問題がありません。");
-					continue;
-				}
-				current =
-					std::make_unique<GameScene>(state, renderer, sound, config);
-				scene = SceneID::Game;
-				continue;
-			}
-			if (enable && GetTitleHowToRect().mouseOver() && MouseL.down())
-			{
-				showHowTo = true;
-				continue;
-			}
-			if (enable && GetTitleExitRect().mouseOver() && MouseL.down())
-			{
-				break;	// アプリ終了
-			}
+			break;
 		}
 
-		//========================
-		//  ゲーム → 遷移制御
-		//========================
-		if (scene == SceneID::Game)
+		// ヘルプ機能
+		if (manager.get())
 		{
-			// GameScene 内部で問題を進め、末尾まで到達したら結果へ
-			if (state.currentIndex >= state.problems.size())
-			{
-				current = std::make_unique<ResultScene>(state, renderer, sound);
-				scene = SceneID::Result;
-				continue;
-			}
-		}
-
-		//========================
-		//  リザルト → 遷移制御
-		//========================
-		if (scene == SceneID::Result)
-		{
-			// 「タイトルへ」相当のボタン領域（ResultScene
-			// の描画座標と合わせる）
-			const RectF backBtn{780, 470, 260, 56};
-			if (backBtn.mouseOver() && MouseL.down())
-			{
-				current = std::make_unique<TitleScene>(
-					sound, state.currentRankName(), config);
-				scene = SceneID::Title;
-				continue;
-			}
-		}
-
-		if ((scene == SceneID::Title) || (scene == SceneID::Game))
-		{
-			// デバッグ：F3 でヘルプ開閉
+			// F3 でヘルプ開閉
 			if (KeyF3.down())
 			{
-				showHowTo = !showHowTo;
+				manager.get()->showHowToPlay = !manager.get()->showHowToPlay;
 			}
-			// 遊び方オーバーレイ表示
-			if (showHowTo)
+			if (manager.get()->showHowToPlay)
 			{
-				DrawHowToOverlay();
+				closeHowToBtn.update();
 
-				const RectF panel{140, 140, 1000, 440};
-				if (ClickedCloseOnHowTo(panel))
+				DrawHowToOverlay();
+				closeHowToBtn.draw();
+				if (closeHowToBtn.isClicked())
 				{
-					showHowTo = false;
+					manager.get()->showHowToPlay = false;
 				}
 				continue;
 			}

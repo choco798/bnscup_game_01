@@ -5,20 +5,17 @@
 #include "Renderer.hpp"
 #include "SoundManager.hpp"
 #include "Config.hpp"
+#include "UiButton.hpp"
 
-class GameScene : public SceneBase
+class GameScene : public KigoGameApp::Scene
 {
    private:
-	GameState& m_state;
-	Renderer& m_renderer;
-	SoundManager& m_sound;
-	Config& m_config;
-
 	Array<LayoutChar> m_chars;
 	bool m_showExplanation = false;
 	bool m_result = false;
 	double m_flowTime = 0.0f;
 	Vec2 m_flowStartPos{};
+	ui::Button m_noKigoBtn;
 
 	void handleClick();
 	void ExecWrong();
@@ -26,10 +23,9 @@ class GameScene : public SceneBase
 	bool isHitKigo() const;
 
    public:
-	GameScene(GameState& state, Renderer& renderer, SoundManager& sound,
-			  Config& config);
+	GameScene(const InitData& init);
 	void startProblem();
-	void update(bool enable) override;
+	void update() override;
 	void draw() const override;
 	void drawKigoRect() const;
 	void drawWordRect(s3d::int32 i, const UIConfig& ui) const;

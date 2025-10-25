@@ -2,15 +2,13 @@
 
 #include "Renderer.hpp"
 
-
-Renderer::Renderer(const Config& config, const String fontName)
-	: m_config(config),
-	  m_fontName{fontName},
-	  m_bg{Texture{U"Assets/images/bg_paper.png"}},
-	  m_teacherNormal{Texture{U"Assets/images/teacher_normal.png"}},
-	  m_teacherHappy{Texture{U"Assets/images/teacher_happy.png"}},
-	  m_teacherAngry{Texture{U"Assets/images/teacher_angry.png"}}
+void Renderer::initRenderer(const String fontName)
 {
+	m_fontName = fontName;
+	m_bg = {Texture{U"Assets/images/bg_paper.png"}};
+	m_teacherNormal = {Texture{U"Assets/images/teacher_normal.png"}};
+	m_teacherHappy = {Texture{U"Assets/images/teacher_happy.png"}};
+	m_teacherAngry = Texture{U"Assets/images/teacher_angry.png"};
 }
 
 void Renderer::drawBackground() const
@@ -60,6 +58,19 @@ void Renderer::drawTeacherAngry() const
 }
 
 void Renderer::drawExplanation(const String& text) const
+{
+	const RectF panel{60, 540, 860, 140};
+	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
+	panel.drawFrame(2, 0, Palette::Gray);
+
+	String show_text = text;
+	show_text.replace(U"*", U"\n");
+
+	FontAsset(U"Explanation")(show_text).draw(panel.pos.movedBy(30, 16),
+											  Palette::Black);
+}
+
+void Renderer::drawTutorial(const String& text) const
 {
 	const RectF panel{60, 540, 860, 140};
 	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
