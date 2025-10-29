@@ -96,7 +96,7 @@ void TitleScene::draw() const
 {
 	Rect{Scene::Size()}.draw(ColorF{0.96});
 
-	FontAsset(U"Title")(U"ああ季語や")
+	FontAsset(U"Title")(U"季語シンクロ！")
 		.drawAt(Scene::Center().x, 160, Palette::Black);
 
 	m_startBtn.draw();
