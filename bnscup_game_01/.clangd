@@ -1,0 +1,30 @@
+CompileFlags:
+  # すべての .cpp に stdafx.h を前取り込み
+  Add: ["-include", "stdafx.h", "-std=c++20", "-Wall"]
+  Remove: ["-fno-exceptions"]
+
+---
+If:
+  # stdafx.cpp 自身は前取り込みを外す
+  PathMatch: ".*[\\/](stdafx)\\.cpp$"
+CompileFlags:
+  Remove: ["-include", "stdafx.h"]
+
+---
+Diagnostics:
+  ClangTidy:
+    Add: [
+      "modernize-use-auto",
+      "modernize-use-nullptr",
+      "modernize-loop-convert",
+      "readability-identifier-naming",
+      "readability-function-cognitive-complexity",
+      "performance-for-range-copy",
+      "performance-unnecessary-copy-initialization",
+      "bugprone-unused-raii",
+      "bugprone-infinite-loop"
+    ]
+    Remove: [
+      "modernize-use-trailing-return-type",
+      "readability-named-parameter"
+    ]
