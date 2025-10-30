@@ -1,14 +1,12 @@
 ﻿#include "Problem.hpp"
 
-bool Problem::isValid() const
+bool Problem::isBasicDataValid() const
 {
-	// 基本データの検証
-	if (id.isEmpty() || text.isEmpty())
-	{
-		return false;
-	}
+	return !id.isEmpty() && !text.isEmpty();
+}
 
-	// 季語関連の検証
+bool Problem::isKigoValid() const
+{
 	if (hasKigo)
 	{
 		if (kigoStart < 0 || kigoEnd < kigoStart)
@@ -19,40 +17,71 @@ bool Problem::isValid() const
 		{
 			return false;
 		}
-		if (kigo.isEmpty())
-		{
-			return false;
-		}
+		return !kigo.isEmpty();
 	}
 	else
 	{
-		if (!(kigoStart == -1 && kigoEnd == -1))
+		return kigoStart == -1 && kigoEnd == -1;
+	}
+}
+
+bool Problem::isGradeValid() const
+{
+	return grade >= 0 && grade < Grade::Count;
+}
+
+bool Problem::isRubyValid() const
+{
+	// テキストが空なのにフリガナがあるのは無効
+	return ruby.isEmpty() || !text.isEmpty();
+}
+
+bool Problem::isRhythmValid() const
+{
+	if (rhythm.isEmpty())
+	{
+		return true;
+	}
+
+	// リズム情報の形式: "44444!64444444!644444"
+	// 数字(音の長さ)と!(休符)の組み合わせ
+	bool hasDigit = false;
+	bool wasExclamation = false;
+
+	for (const auto ch : rhythm)
+	{
+		if (InRange(ch, U'0', U'9'))
 		{
-			return false;
+			hasDigit = true;
+			wasExclamation = false;
+		}
+		else if (ch == U'!')
+		{
+			if (wasExclamation || !hasDigit)
+			{
+				// 連続した!または数字の前の!は無効
+				return false;
+			}
+			wasExclamation = true;
+		}
+		else
+		{
+			return false;  // 数字と!以外は無効
 		}
 	}
 
-	// 段位の検証
-	if (grade < 0 || grade >= Grade::Count)
+	// 最後が!で終わっているのは無効
+	if (wasExclamation)
 	{
 		return false;
 	}
 
-	// フリガナとリズム情報の検証
-	if (!ruby.isEmpty() && text.isEmpty())
-	{
-		return false;  // テキストが空なのにフリガナがある
-	}
+	// 数字が1つも無いのは無効
+	return hasDigit;
+}
 
-	if (!rhythm.isEmpty())
-	{
-		// リズム情報は "5-7-5" のような形式
-		const auto parts = rhythm.split(U'-');
-		if (parts.size() != 3)
-		{
-			return false;
-		}
-	}
-
-	return true;
+bool Problem::isValid() const
+{
+	return isBasicDataValid() && isKigoValid() && isGradeValid() &&
+		   isRubyValid() && isRhythmValid();
 }

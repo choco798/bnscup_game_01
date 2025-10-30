@@ -31,6 +31,15 @@ struct Problem
 
 	bool isValid() const;  // データの整合性チェック
 
+   private:
+	// 検証メソッドを細分化
+	bool isBasicDataValid() const;	// 基本データの検証
+	bool isKigoValid() const;		// 季語関連の検証
+	bool isGradeValid() const;		// 段位の検証
+	bool isRubyValid() const;		// フリガナの検証
+	bool isRhythmValid() const;		// リズム情報の検証
+
+   public:
 	// デフォルトコンストラクタ
 	Problem() : hasKigo(false), kigoStart(-1), kigoEnd(-1)
 	{
