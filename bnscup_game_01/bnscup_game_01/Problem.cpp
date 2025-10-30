@@ -13,7 +13,7 @@ bool Problem::isKigoValid() const
 		{
 			return false;
 		}
-		if (kigoEnd >= static_cast<int32>(text.size()))
+		if (kigoEnd > static_cast<int32>(text.size()))
 		{
 			return false;
 		}

@@ -5,6 +5,7 @@
 #include "Config.hpp"
 #include "GameScene.hpp"
 #include "GameState.hpp"
+#include "HowToPlay.hpp"
 #include "ProblemManager.hpp"
 #include "Renderer.hpp"
 #include "ResultScene.hpp"
@@ -12,7 +13,6 @@
 #include "SoundManager.hpp"
 #include "TitleScene.hpp"
 #include "UiButton.hpp"
-#include "HowToPlay.hpp"
 
 enum class SceneID
 {
@@ -23,12 +23,6 @@ enum class SceneID
 
 namespace
 {
-
-bool ClickedCloseOnHowTo(const RectF& panel)
-{
-	const RectF close{panel.x + panel.w - 200, panel.y + panel.h - 68, 160, 48};
-	return (close.mouseOver() && MouseL.down());
-}
 
 void InitializeGameAsset()
 {
@@ -63,16 +57,10 @@ void Main()
 	// ゲームアセットを準備する
 	::InitializeGameAsset();
 
-	// 設定ロード
-	Config config;
-	config.load(U"config.json");
-
-	Window::Resize(config.ui().clientSizeX, config.ui().clientSizeY);
-	Scene::SetBackground(ColorF{0.95});
-
 	const RectF panel{140, 140, 1000, 440};
-	ui::Button closeHowToBtn{U"　閉じる　", U"HowToPlay",
-						Vec2{panel.x + panel.w - 120, panel.y + panel.h - 44}};
+	ui::Button closeHowToBtn{
+		U"　閉じる　", U"HowToPlay",
+		Vec2{panel.x + panel.w - 120, panel.y + panel.h - 44}};
 
 	// 問題ロード
 	ProblemManager problemManager;
@@ -86,11 +74,19 @@ void Main()
 	// シーン管理
 	KigoGameApp manager;
 
+	// 設定ロード
 	if (manager.get())
 	{
 		manager.get()->sound.loadAssets();
-		manager.get()->gameState = GameState{problemManager.getProblems()};
+		manager.get()->saveDataManager.initialize(U"savedata.json");
+		manager.get()->configManager.initialize(U"config.json");
+		manager.get()->gameState.initialize();
+		manager.get()->gameState.problems = problemManager.getProblems();
 		manager.get()->renderer.initRenderer(U"Game");
+
+		Window::Resize(manager.get()->configManager.ui().clientSizeX,
+					   manager.get()->configManager.ui().clientSizeY);
+		Scene::SetBackground(ColorF{0.95});
 	}
 
 	manager.add<TitleScene>(State::Title);
@@ -98,7 +94,6 @@ void Main()
 	manager.add<ResultScene>(State::Result);
 
 	manager.init(State::Title);
-
 
 	while (System::Update())
 	{

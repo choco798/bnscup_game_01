@@ -4,8 +4,8 @@ TitleScene::TitleScene(const InitData& init) : IScene{init}
 {
 	getData().sound.playBGM();
 
-	getData().sound.setBgmVolume(getData().config.audio().bgmVolume);
-	getData().sound.setSeVolume(getData().config.audio().seVolume);
+	getData().sound.setBgmVolume(getData().configManager.audio().bgmVolume);
+	getData().sound.setSeVolume(getData().configManager.audio().seVolume);
 
 	m_startBtn =
 		ui::Button(U"ゲーム開始", U"Title", Vec2{Scene::Center().x, 360});

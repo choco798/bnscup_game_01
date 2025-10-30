@@ -116,6 +116,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="HowToPlay.cpp" />
@@ -124,6 +125,7 @@
     <ClCompile Include="ProblemManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResultScene.cpp" />
+    <ClCompile Include="SaveDataManager.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -338,6 +340,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.hpp" />
+    <ClInclude Include="ConfigManager.hpp" />
     <ClInclude Include="GameScene.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="HowToPlay.hpp" />
@@ -345,6 +348,7 @@
     <ClInclude Include="ProblemManager.hpp" />
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="ResultScene.hpp" />
+    <ClInclude Include="SaveDataManager.hpp" />
     <ClInclude Include="SceneBase.hpp" />
     <ClInclude Include="SoundManager.hpp" />
     <ClInclude Include="stdafx.h" />

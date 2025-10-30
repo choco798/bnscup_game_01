@@ -12,21 +12,20 @@ struct UIConfig
 	int32_t clientSizeY = 720;
 };
 
-// AudioConfig 構造体とアクセサ
 struct AudioConfig
 {
 	double bgmVolume = 0.6;	 // 0.0 - 1.0
 	double seVolume = 0.8;	 // 0.0 - 1.0
 };
 
-class Config
+struct SaveData
 {
-   private:
-	UIConfig m_ui;
-	AudioConfig m_audio;
+	size_t rankIndex = 0;				   // 現在の段位
+	Array<size_t> gradeProgress{0, 0, 0};  // 各段位での進捗
+	Array<bool> problemStatus;			   // 問題ごとのクリア状況
+	int32 totalScore = 0;				   // 累計スコア
 
-   public:
-	bool load(const FilePath& path);
-	const UIConfig& ui() const noexcept;
-	const AudioConfig& audio() const noexcept;
+	// JSONシリアライズ用
+	void serialize(JSON& json) const;
+	void deserialize(const JSON& json);
 };

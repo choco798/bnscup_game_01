@@ -143,7 +143,7 @@ void GameScene::startProblem()
 		return;
 	}
 
-	const auto& ui = getData().config.ui();
+	const auto& ui = getData().configManager.ui();
 	TextLayouter layouter{U"Game", ui.maxLineWidth, ui.lineHeightScale,
 						  ui.lineWidthScale,
 						  static_cast<double>(ui.clientSizeX)};
@@ -212,8 +212,8 @@ void GameScene::draw() const
 	// ミスクリック時に方向を示す
 	if (m_flowTime > 0.0f)
 	{
-		DrawFlowHintPastel(RectF(getData().config.ui().clientSizeX,
-								 getData().config.ui().clientSizeY),
+		DrawFlowHintPastel(RectF(getData().configManager.ui().clientSizeX,
+								 getData().configManager.ui().clientSizeY),
 						   (m_flowStartPos - getKigoRectCenter()), m_flowTime);
 	}
 
@@ -266,7 +266,7 @@ void GameScene::drawKigoRect() const
 		getData().gameState.problems[getData().gameState.currentIndex];
 	if (prob.hasKigo)
 	{
-		const auto& ui = getData().config.ui();
+		const auto& ui = getData().configManager.ui();
 		for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
 		{
 			drawWordRect(i, ui);
@@ -276,7 +276,7 @@ void GameScene::drawKigoRect() const
 
 void GameScene::drawHiakuRect() const
 {
-	const auto& ui = getData().config.ui();
+	const auto& ui = getData().configManager.ui();
 	for (int32 i = 0; i < m_chars.size(); ++i)
 	{
 		drawWordRect(i, ui);
@@ -309,7 +309,7 @@ Vec2 GameScene::getKigoRectCenter() const
 		getData().gameState.problems[getData().gameState.currentIndex];
 	if (prob.hasKigo)
 	{
-		const auto& ui = getData().config.ui();
+		const auto& ui = getData().configManager.ui();
 		for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
 		{
 			const bool isSpace =
@@ -344,7 +344,7 @@ bool GameScene::isHitKigo() const
 		return false;
 	}
 
-	const auto& ui = getData().config.ui();
+	const auto& ui = getData().configManager.ui();
 
 	for (int32 i = prob.kigoStart; i < prob.kigoEnd; ++i)
 	{

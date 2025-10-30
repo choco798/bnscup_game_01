@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include <Siv3D.hpp>
-#include "Config.hpp"
+#include "ConfigManager.hpp"
 #include "GameState.hpp"
 #include "Renderer.hpp"
+#include "SaveDataManager.hpp"
 #include "SoundManager.hpp"
 
 class SceneBase
@@ -26,9 +27,10 @@ enum class State
 struct GameData
 {
 	SoundManager sound{};
-	const Config config{};
+	ConfigManager configManager{};
+	SaveDataManager saveDataManager{};
 	bool showHowToPlay{};
-	GameState gameState{};
+	GameState gameState{saveDataManager, configManager};
 	Renderer renderer{};
 };
 

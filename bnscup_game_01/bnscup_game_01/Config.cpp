@@ -1,40 +1,62 @@
 ﻿#include "Config.hpp"
 
-bool Config::load(const FilePath& path)
+void SaveData::serialize(JSON& json) const
 {
-	const JSON json = JSON::Load(path);
-	if (!json)
-	{
-		// 既定値のまま false
-		return false;
-	}
+	json[U"rankIndex"] = static_cast<int64>(rankIndex);
+	json[U"totalScore"] = static_cast<int64>(totalScore);
 
-	if (const auto ui = json[U"ui"])
+	// 配列をJSONArrayに変換
+	Array<JSON> progressArray;
+	for (size_t progress : gradeProgress)
 	{
-		m_ui.maxLineWidth =
-			ui[U"maxLineWidth"].getOr<double>(m_ui.maxLineWidth);
-		m_ui.lineHeightScale =
-			ui[U"lineHeightScale"].getOr<double>(m_ui.lineHeightScale);
-		m_ui.hitboxPaddingPx =
-			ui[U"hitboxPaddingPx"].getOr<double>(m_ui.hitboxPaddingPx);
-		m_ui.hitboxPaddingScale =
-			ui[U"hitboxPaddingScale"].getOr<double>(m_ui.hitboxPaddingScale);
+		progressArray.push_back(JSON(static_cast<int64>(progress)));
 	}
+	json[U"gradeProgress"] = JSON(progressArray);
 
-	if (const auto au = json[U"audio"])
+	Array<JSON> statusArray;
+	for (bool status : problemStatus)
 	{
-		m_audio.bgmVolume = au[U"bgmVolume"].getOr<double>(m_audio.bgmVolume);
-		m_audio.seVolume = au[U"seVolume"].getOr<double>(m_audio.seVolume);
+		statusArray.push_back(JSON(status));
 	}
-	return true;
+	json[U"problemStatus"] = JSON(statusArray);
 }
 
-const UIConfig& Config::ui() const noexcept
+void SaveData::deserialize(const JSON& json)
 {
-	return m_ui;
-}
+	rankIndex = static_cast<size_t>(json[U"rankIndex"].getOr<int64>(0));
+	totalScore = json[U"totalScore"].getOr<int32>(0);
 
-const AudioConfig& Config::audio() const noexcept
-{
-	return m_audio;
+	// gradeProgress配列の手動読み取り
+	gradeProgress.clear();
+	if (json.hasElement(U"gradeProgress") && json[U"gradeProgress"].isArray())
+	{
+		const JSON& progressArray = json[U"gradeProgress"];
+		gradeProgress.reserve(progressArray.size());
+
+		for (size_t i = 0; i < progressArray.size(); ++i)
+		{
+			auto value = progressArray[i].getOr<int64>(0);
+			gradeProgress.push_back(static_cast<size_t>(value));
+		}
+	}
+
+	// デフォルト値で初期化（3つの段位分）
+	if (gradeProgress.size() < 3)
+	{
+		gradeProgress.resize(3, 0);
+	}
+
+	// problemStatus配列の手動読み取り
+	problemStatus.clear();
+	if (json.hasElement(U"problemStatus") && json[U"problemStatus"].isArray())
+	{
+		const JSON& statusArray = json[U"problemStatus"];
+		problemStatus.reserve(statusArray.size());
+
+		for (size_t i = 0; i < statusArray.size(); ++i)
+		{
+			bool status = statusArray[i].getOr<bool>(false);
+			problemStatus.push_back(status);
+		}
+	}
 }
