@@ -1,5 +1,4 @@
 ﻿#include "ResultScene.hpp"
-#include "stdafx.h"
 
 ResultScene::ResultScene(const InitData& data) : IScene{data}
 {

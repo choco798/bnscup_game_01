@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "UiButton.hpp"
+﻿#include "UiButton.hpp"
 
 ui::Button::Button(const String& text, const String& fontAssetKey,
 						  const Vec2& pos)

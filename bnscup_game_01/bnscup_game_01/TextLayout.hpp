@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 struct LayoutChar
 {
 	char32 ch;			// 文字
@@ -23,6 +22,7 @@ class TextLayouter
 				 double lineWidthScale, double clientSize);
 	Array<LayoutChar> layout(const String &text) const;
 
-	void InsertBreakInText(double &text_y, double &text_x, double lineWidth, double localFontY, int32_t& lineCount,
+	void InsertBreakInText(double &text_y, double &text_x, double lineWidth,
+						   double localFontY, int32_t &lineCount,
 						   s3d::Array<size_t> &breakablePositions) const;
 };

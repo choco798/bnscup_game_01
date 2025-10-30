@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include <Siv3D.hpp>
-#include "GameState.hpp"
 #include "Config.hpp"
-#include "SoundManager.hpp"
+#include "GameState.hpp"
 #include "Renderer.hpp"
+#include "SoundManager.hpp"
 
 class SceneBase
 {

@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "GameScene.hpp"
+﻿#include "GameScene.hpp"
 
 // ローカル関数定義
 
@@ -118,11 +116,11 @@ void DrawFlowHintPastel(const RectF& area, Vec2 dir, double t01,
 
 		// 軌跡（やわらかい流れ方向のヒント）
 		const Vec2 tail = p - nDir * trailLength;
+		(void)tail;
 		// Line{tail, p}.draw(2.0, col);
 		Circle{p, size}.draw(col);
 	}
 }
-
 
 ////////////////////////
 // ここからGameScene
@@ -149,7 +147,8 @@ void GameScene::startProblem()
 	TextLayouter layouter{U"Game", ui.maxLineWidth, ui.lineHeightScale,
 						  ui.lineWidthScale,
 						  static_cast<double>(ui.clientSizeX)};
-	m_chars = layouter.layout(getData().gameState.problems[getData().gameState.currentIndex].text);
+	m_chars = layouter.layout(
+		getData().gameState.problems[getData().gameState.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
 	const Vec2 base{ui.clientSizeX / 2, 60};
@@ -213,9 +212,9 @@ void GameScene::draw() const
 	// ミスクリック時に方向を示す
 	if (m_flowTime > 0.0f)
 	{
-		DrawFlowHintPastel(
-			RectF(getData().config.ui().clientSizeX, getData().config.ui().clientSizeY),
-			(m_flowStartPos - getKigoRectCenter()), m_flowTime);
+		DrawFlowHintPastel(RectF(getData().config.ui().clientSizeX,
+								 getData().config.ui().clientSizeY),
+						   (m_flowStartPos - getKigoRectCenter()), m_flowTime);
 	}
 
 	// 俳句本文
@@ -245,7 +244,9 @@ void GameScene::draw() const
 	if (m_showExplanation)
 	{
 		getData().renderer.drawExplanation(
-			getData().gameState.problems[getData().gameState.currentIndex].explanation);
+			getData()
+				.gameState.problems[getData().gameState.currentIndex]
+				.explanation);
 	}
 	else
 	{
@@ -261,7 +262,8 @@ void GameScene::draw() const
 
 void GameScene::drawKigoRect() const
 {
-	const auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
+	const auto& prob =
+		getData().gameState.problems[getData().gameState.currentIndex];
 	if (prob.hasKigo)
 	{
 		const auto& ui = getData().config.ui();
@@ -303,7 +305,8 @@ Vec2 GameScene::getKigoRectCenter() const
 	Vec2 result{};
 	int rectCount{};
 
-	const auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
+	const auto& prob =
+		getData().gameState.problems[getData().gameState.currentIndex];
 	if (prob.hasKigo)
 	{
 		const auto& ui = getData().config.ui();
@@ -334,7 +337,8 @@ RectF GameScene::Inflate(const RectF& r, double padPx, double padScale)
 
 bool GameScene::isHitKigo() const
 {
-	const auto& prob = getData().gameState.problems[getData().gameState.currentIndex];
+	const auto& prob =
+		getData().gameState.problems[getData().gameState.currentIndex];
 	if (!prob.hasKigo)
 	{
 		return false;

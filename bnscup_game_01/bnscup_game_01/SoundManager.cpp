@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "SoundManager.hpp"
+﻿#include "SoundManager.hpp"
 
 void SoundManager::loadAssets()
 {

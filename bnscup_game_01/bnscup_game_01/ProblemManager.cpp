@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "ProblemManager.hpp"
+﻿#include "ProblemManager.hpp"
 
 bool ProblemManager::loadFromJSON(const FilePath& path)
 {

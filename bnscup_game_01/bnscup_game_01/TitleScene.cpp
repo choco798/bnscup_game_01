@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "TitleScene.hpp"
+﻿#include "TitleScene.hpp"
 
 TitleScene::TitleScene(const InitData& init) : IScene{init}
 {
@@ -13,8 +11,7 @@ TitleScene::TitleScene(const InitData& init) : IScene{init}
 		ui::Button(U"ゲーム開始", U"Title", Vec2{Scene::Center().x, 360});
 	m_howToBtn =
 		ui::Button(U"遊び方", U"TitleText", Vec2{Scene::Center().x, 480});
-	m_exitBtn =
-		ui::Button(U"終了", U"TitleText", Vec2{Scene::Center().x, 560});
+	m_exitBtn = ui::Button(U"終了", U"TitleText", Vec2{Scene::Center().x, 560});
 }
 
 void TitleScene::update()
@@ -89,7 +86,6 @@ void TitleScene::update()
 	{
 		System::Exit();
 	}
-
 }
 
 void TitleScene::draw() const
@@ -128,7 +124,7 @@ void TitleScene::draw() const
 		// ノブ
 		const Circle bgmKnob{
 			bgmBar.x + bgmBar.w * getData().sound.getBgmVolume(),
-							 bgmBar.y + bgmBar.h * 0.5, 10};
+			bgmBar.y + bgmBar.h * 0.5, 10};
 		const Circle seKnob{seBar.x + seBar.w * getData().sound.getSeVolume(),
 							seBar.y + seBar.h * 0.5, 10};
 		bgmKnob.draw(Palette::White).drawFrame(2, 0, Palette::Black);
@@ -137,7 +133,8 @@ void TitleScene::draw() const
 
 	// 著作権表示
 	FontAsset(U"Copyright")(
-		U"Version 0.5  2025/10/25\nCopyright\nプログラム・サウンド: Nasatame \nプログラム・イラスト: moqueca "
+		U"Version 0.5  2025/10/25\nCopyright\nプログラム・サウンド: Nasatame "
+		U"\nプログラム・イラスト: moqueca "
 		U"\n音楽：TAM Music Factory")
 		.draw(Scene::Rect().leftCenter() + Vec2(50, 200), Palette::Black);
 }

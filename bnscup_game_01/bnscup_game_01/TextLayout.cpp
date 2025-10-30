@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "TextLayout.hpp"
+﻿#include "TextLayout.hpp"
 
 TextLayouter::TextLayouter(const String fontName, double maxWidth,
 						   double lineHeightScale, double lineWidthScale,
@@ -61,7 +59,7 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 
 			InsertBreakInText(text_y, text_x, lineWidth,
 							  static_cast<double>(localFont.height()),
-							  lineCount,breakablePositions);
+							  lineCount, breakablePositions);
 			continue;
 		}
 

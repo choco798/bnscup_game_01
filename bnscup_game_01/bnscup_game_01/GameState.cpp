@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "GameState.hpp"
+﻿#include "GameState.hpp"
 
 void GameState::state_reset()
 {

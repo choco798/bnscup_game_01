@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "Config.hpp"
+﻿#include "Config.hpp"
 
 bool Config::load(const FilePath& path)
 {

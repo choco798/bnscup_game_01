@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "Renderer.hpp"
+﻿#include "Renderer.hpp"
 
 void Renderer::initRenderer(const String fontName)
 {

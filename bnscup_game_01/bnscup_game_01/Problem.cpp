@@ -1,6 +1,4 @@
-﻿#include "stdafx.h"
-
-#include "Problem.hpp"
+﻿#include "Problem.hpp"
 
 bool Problem::isValid() const
 {

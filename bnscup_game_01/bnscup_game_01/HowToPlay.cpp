@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "HowToPlay.hpp"
+﻿#include "HowToPlay.hpp"
 
 // 簡易ヘルプ表示
 void DrawHowToOverlay()

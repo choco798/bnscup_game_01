@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "SceneBase.hpp"
+#include "Config.hpp"
 #include "GameState.hpp"
 #include "Renderer.hpp"
+#include "SceneBase.hpp"
 #include "SoundManager.hpp"
-#include "Config.hpp"
 #include "UiButton.hpp"
 
 class GameScene : public KigoGameApp::Scene
