@@ -2,15 +2,15 @@
 
 bool ProblemManager::loadFromJSON(const FilePath& path)
 {
+	// 全配列をクリア
 	m_problems.clear();
-
-	const JSON json = JSON::Load(path);
-	if (!json)
+	for (auto& gradeArray : m_gradeProblems)
 	{
-		return false;
+		gradeArray.clear();
 	}
 
-	if (!json.hasElement(U"problems"))
+	const JSON json = JSON::Load(path);
+	if (!json || !json.hasElement(U"problems"))
 	{
 		return false;
 	}
@@ -27,6 +27,12 @@ bool ProblemManager::loadFromJSON(const FilePath& path)
 		p.kigoStart = pj[U"kigoStart"].getOr<int32>(-1);
 		p.kigoEnd = pj[U"kigoEnd"].getOr<int32>(-1);
 		p.explanation = pj[U"explanation"].getOr<String>(U"");
+		p.grade =
+			pj[U"grade"].getOr<int32>(Grade::Trainee);	// デフォルトは特待生
+		p.ruby = pj[U"ruby"].getOr<String>(U"");		// フリガナ情報
+		p.rhythm = pj[U"rhythm"].getOr<String>(U"");	// リズム情報
+
+		// タグ情報の読み込み
 		if (const auto tags = pj[U"tags"]; tags && tags.isArray())
 		{
 			for (const auto& t : tags.arrayView())
@@ -40,22 +46,53 @@ bool ProblemManager::loadFromJSON(const FilePath& path)
 			Console << U"[ProblemManager] invalid problem: {}"_fmt(p.id);
 			continue;  // 不正なものはスキップ
 		}
-		m_problems << std::move(p);
+
+		m_problems << p;  // 全問題配列に追加
 	}
+
+	// 問題を段位別に振り分け
+	filterProblemsByGrade();
+
 	return (!m_problems.isEmpty());
 }
 
-const Array<Problem>& ProblemManager::getProblems() const noexcept
+void ProblemManager::filterProblemsByGrade()
 {
-	return m_problems;
+	// 各段位の配列をクリア
+	for (auto& gradeArray : m_gradeProblems)
+	{
+		gradeArray.clear();
+	}
+
+	// 問題を段位別に振り分け
+	for (const auto& problem : m_problems)
+	{
+		if (problem.grade >= 0 && problem.grade < Grade::Count)
+		{
+			m_gradeProblems[problem.grade] << problem;
+		}
+	}
 }
 
-const Problem& ProblemManager::getProblem(size_t index) const
+const Array<Problem>& ProblemManager::getProblemsForGrade(int32 grade) const
 {
-	return m_problems.at(index);
+	return m_gradeProblems[grade];
 }
 
-size_t ProblemManager::size() const noexcept
+void ProblemManager::shuffleProblemsForGrade(int32 grade)
 {
-	return m_problems.size();
+	if (grade >= 0 && grade < Grade::Count)
+	{
+		m_gradeProblems[grade].shuffle();
+	}
+}
+
+size_t ProblemManager::getCompletedCountForGrade(int32 grade) const
+{
+	if (grade >= 0 && grade < Grade::Count)
+	{
+		return m_gradeProblems[grade].count_if([](const Problem& p)
+											   { return p.completed; });
+	}
+	return 0;
 }

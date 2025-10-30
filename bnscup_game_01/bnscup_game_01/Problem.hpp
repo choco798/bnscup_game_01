@@ -1,5 +1,14 @@
 ﻿#pragma once
 
+// 段位の定数定義
+struct Grade
+{
+	static constexpr int32 Trainee = 0;	 // 特待生
+	static constexpr int32 Master = 1;	 // 名人
+	static constexpr int32 Expert = 2;	 // 達人
+	static constexpr int32 Count = 3;	 // 段位の数
+};
+
 struct Problem
 {
 	String id;			 // 問題ID
@@ -13,6 +22,17 @@ struct Problem
 	String explanation;	 // 正解時の解説テキスト
 	Array<String> tags;	 // メタ情報タグ
 
-	bool isValid() const;  // 範囲検証
-};
+	// 段位システム用フィールド
+	int32 grade = Grade::Trainee;  // 難易度（0=特待生, 1=名人, 2=達人）
+	bool completed = false;		   // 正解済みフラグ
+	String ruby;				   // フリガナ情報
+	String rhythm;				   // リズム情報
+	bool displayRuby = false;	   // フリガナ表示フラグ
 
+	bool isValid() const;  // データの整合性チェック
+
+	// デフォルトコンストラクタ
+	Problem() : hasKigo(false), kigoStart(-1), kigoEnd(-1)
+	{
+	}
+};
