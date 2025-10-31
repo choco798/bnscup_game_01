@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-#include "GameState.hpp"
-#include "Renderer.hpp"
-#include "SoundManager.hpp"
 #include "SceneBase.hpp"
 #include "UiButton.hpp"
 

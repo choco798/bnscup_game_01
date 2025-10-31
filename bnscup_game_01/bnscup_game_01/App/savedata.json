@@ -1,10 +1,10 @@
-{
-	"rankIndex": 0,
-	"gradeProgress": [0, 0, 0],
-	"problemStatus": [
-		false, false, false, false, false,  // 特待生問題
-		false, false, false, false, false,  // 名人問題
-		false, false, false, false, false   // 達人問題
-	],
-	"totalScore": 0
+﻿{
+  "gradeProgress": [
+    0,
+    0,
+    0
+  ],
+  "problemStatus": [],
+  "rankIndex": 0,
+  "totalScore": 150
 }

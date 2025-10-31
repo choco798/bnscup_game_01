@@ -431,7 +431,9 @@ void GameScene::ExecWrong()
 void GameScene::ExecCorrect()
 {
 	getData().sound.playCorrect();
-	getData().gameState.score += 10;
+	getData().gameState.score +=
+		10 *
+		(getData().gameState.problems[getData().gameState.currentIndex].grade + 1);
 	getData().gameState.correctCount += 1;
 	m_showExplanation = true;
 }
