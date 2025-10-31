@@ -55,22 +55,41 @@ void Renderer::drawTeacherAngry() const
 	}
 }
 
-void Renderer::drawExplanation(const String& text) const
+void Renderer::drawExplanation(const String& kigo, const String& season,
+							   const String& text) const
 {
-	const RectF panel{60, 540, 860, 140};
-	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
-	panel.drawFrame(2, 0, Palette::Gray);
-
 	String show_text = text;
 	show_text.replace(U"*", U"\n");
 
-	FontAsset(U"Explanation")(show_text).draw(panel.pos.movedBy(30, 16),
+	String kigo_show_text = U"季語 : " + kigo;
+
+	const RectF panelSeason{60, 470, 120, 50};
+	panelSeason.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
+	panelSeason.drawFrame(2, 0, Palette::Gray);
+
+	const RectF panelKigo{
+		200, 470, 60 + FontAsset(U"Explanation")(kigo_show_text).region().w,
+		50};
+	panelKigo.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
+	panelKigo.drawFrame(2, 0, Palette::Gray);
+
+	const RectF panelMain{60, 540, 1100, 140};
+	panelMain.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
+	panelMain.drawFrame(2, 0, Palette::Gray);
+
+	FontAsset(U"Explanation")(season).draw(panelSeason.pos.movedBy(30, 0),
+										   Palette::Black);
+	FontAsset(U"Explanation")(kigo_show_text)
+		.draw(panelKigo.pos.movedBy(30, 0),
+										 Palette::Black);
+
+	FontAsset(U"Explanation")(show_text).draw(panelMain.pos.movedBy(30, 16),
 											  Palette::Black);
 }
 
 void Renderer::drawTutorial(const String& text) const
 {
-	const RectF panel{60, 540, 860, 140};
+	const RectF panel{60, 540, 1100, 140};
 	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
 	panel.drawFrame(2, 0, Palette::Gray);
 

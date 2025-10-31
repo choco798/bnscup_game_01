@@ -24,5 +24,6 @@ class TextLayouter
 
 	void InsertBreakInText(double &text_y, double &text_x, double lineWidth,
 						   double localFontY, int32_t &lineCount,
+						   int32_t &headPos,
 						   s3d::Array<size_t> &breakablePositions) const;
 };

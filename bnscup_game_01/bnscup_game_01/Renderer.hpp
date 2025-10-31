@@ -20,6 +20,7 @@ class Renderer
 	void drawTeacherNormal() const;
 	void drawTeacherHappy() const;
 	void drawTeacherAngry() const;
-	void drawExplanation(const String& text) const;
+	void drawExplanation(const String& kigo, const String& season,
+						 const String& text) const;
 	void drawTutorial(const String& text) const;
 };

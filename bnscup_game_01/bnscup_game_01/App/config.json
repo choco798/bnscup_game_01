@@ -1,8 +1,16 @@
-{
+﻿{
+  "audio": {
+    "bgmVolume": 0.6,
+    "seVolume": 0.8
+  },
   "ui": {
-    "maxLineWidth": 920,         // 1行の最大幅(px)
-    "lineHeightScale": 1.25,     // 行送り倍率（フォントサイズ×倍率）
-    "hitboxPaddingPx": 6,        // 文字当たり判定の膨張量（px）
-    "hitboxPaddingScale": 0.10   // 文字幅に対する割合（どちらか片方/併用可）
+    "clientSizeX": 1280,
+    "clientSizeY": 720,
+    "hitboxPaddingPx": 6.0,
+    "hitboxPaddingScale": 0.1,
+    "lineHeightScale": 1.25,
+    "lineWidthScale": 1.25,
+    "maxLineWidth": 920.0,
+    "wordWidth": 80
   }
 }

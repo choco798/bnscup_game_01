@@ -1,5 +1,5 @@
 {
-  "gameTitle": "ブレバトの季語探しゲーム",
+  "gameTitle": "季語シンクロ！",
   "version": "1.0",
   "problems": [
     {
@@ -11,11 +11,14 @@
       "rhythm": "44444!64444444!644444",
       "hasKigo": true,
       "kigo": "蛙（かわず、かえる）",
-      "kigoStart": 4,
-      "kigoEnd": 5,
+      "kigoStart": 3,
+      "kigoEnd": 4,
       "explanation": "静かな池に蛙（かえる）がとびこみ、*水の音だけがひびきます。",
       "note": "",
-      "tags": ["春","有名句"],
+      "tags": [
+        "春",
+        "有名句"
+      ],
       "grade": 0,
       "displayRuby": true
     },
@@ -32,7 +35,10 @@
       "kigoEnd": 2,
       "explanation": "戦の跡に草がしげる様を通し夢のはかなさを詠みました。",
       "note": "",
-      "tags": ["夏","有名句"],
+      "tags": [
+        "夏",
+        "有名句"
+      ],
       "grade": 0,
       "displayRuby": true
     },
@@ -47,9 +53,12 @@
       "kigo": "秋深き",
       "kigoStart": 0,
       "kigoEnd": 3,
-      "explanation": "「秋深き」は秋の季語。人恋しさを詠んだ句です。",
+      "explanation": "人恋しさを詠んだ句です。",
       "note": "",
-      "tags": ["秋","有名句"],
+      "tags": [
+        "秋",
+        "有名句"
+      ],
       "grade": 0,
       "displayRuby": true
     },
@@ -64,9 +73,12 @@
       "kigo": "初しぐれ",
       "kigoStart": 0,
       "kigoEnd": 4,
-      "explanation": "「初しぐれ」は冬の季語。寒さに備える猿の姿を詠んでいます。",
+      "explanation": "寒さに備える猿の姿を詠んでいます。",
       "note": "",
-      "tags": ["冬","有名句"],
+      "tags": [
+        "冬",
+        "有名句"
+      ],
       "grade": 0,
       "displayRuby": true
     },
@@ -78,12 +90,15 @@
       "ruby": "松島(まつしま)や ああ松島(まつしま)や 松島(まつしま)や",
       "rhythm": "444444!44444444!444444",
       "hasKigo": false,
-      "kigo": "",
+      "kigo": "なし",
       "kigoStart": -1,
       "kigoEnd": -1,
       "explanation": "松島の美しさのあまり俳句ができなかった。*などと、芭蕉の句と誤解されますが、後の人が創作したものです。",
       "note": "季語なしボタンが正解",
-      "tags": ["有名句","季語なし"],
+      "tags": [
+        "有名句",
+        "季語なし"
+      ],
       "grade": 0,
       "displayRuby": true
     },
@@ -91,16 +106,19 @@
       "id": "semi_shinuru_001",
       "author": "松尾芭蕉",
       "source": "俳諧",
-      "text": "閑かさや 岩にしみ入る 蝉の声",
-      "ruby": "閑(しず)かさや 岩(いわ)にしみ入(い)る 蝉(せみ)の声(こえ)",
+      "text": "閑さや 岩にしみ入る 蝉の声",
+      "ruby": "閑(しずけ)さや 岩(いわ)にしみ入(い)る 蝉(せみ)の声(こえ)",
       "rhythm": "44444!64444444!644444444",
       "hasKigo": true,
       "kigo": "蝉",
-      "kigoStart": 11,
-      "kigoEnd": 12,
-      "explanation": "岩にしみこむ蝉（せみ）の声が山の空気にひびきます。",
+      "kigoStart": 9,
+      "kigoEnd": 10,
+      "explanation": "岩にしみそうなほど、蝉が鳴いているのにもかかわらず、*心が閑なことを詠んでいます。",
       "note": "",
-      "tags": ["夏","有名句"],
+      "tags": [
+        "夏",
+        "有名句"
+      ],
       "grade": 1,
       "displayRuby": true
     },
@@ -112,17 +130,20 @@
       "ruby": "名月(めいげつ)や 池(いけ)をめぐりて 夜(よ)もすがら",
       "rhythm": "44444!64444444!64444444",
       "hasKigo": true,
-      "kigo": "名月",
+      "kigo": "名月(めいげつ)",
       "kigoStart": 0,
       "kigoEnd": 2,
-      "explanation": "「名月」は秋の季語。美しい満月の夜を詠んでいます。",
+      "explanation": "美しい満月の夜を詠んでいます。",
       "note": "",
-      "tags": ["秋","有名句"],
+      "tags": [
+        "秋",
+        "有名句"
+      ],
       "grade": 1,
       "displayRuby": true
     },
     {
-      "id": "fuyu_no_kawa_001",
+      "id": "fuyu_no_suzume_001",
       "author": "小林一茶",
       "source": "俳句集",
       "text": "我と来て 遊べや親の ない雀",
@@ -130,11 +151,14 @@
       "rhythm": "44444!64444444!64444444",
       "hasKigo": true,
       "kigo": "雀（すずめ）",
-      "kigoStart": 13,
-      "kigoEnd": 15,
+      "kigoStart": 11,
+      "kigoEnd": 12,
       "explanation": "孤独（こどく）な心を小鳥に託した句です。",
       "note": "",
-      "tags": ["冬","有名句"],
+      "tags": [
+        "冬",
+        "有名句"
+      ],
       "grade": 1,
       "displayRuby": true
     },
@@ -151,7 +175,10 @@
       "kigoEnd": 3,
       "explanation": "おだやかな波の音で春の海がゆれる。",
       "note": "",
-      "tags": ["春","有名句"],
+      "tags": [
+        "春",
+        "有名句"
+      ],
       "grade": 1,
       "displayRuby": true
     },
@@ -159,16 +186,20 @@
       "id": "yamazato_001",
       "author": "源宗于朝臣",
       "source": "百人一首",
-      "text": "山里は 冬ぞさびしさ まさりける 人目も草も かれぬと思へば",
+      "text": "山里は 冬ぞさびしさ まさりける ^人目も草も かれぬと思へば",
       "ruby": "山里(やまざと)は 冬(ふゆ)ぞさびしさ まさりける 人目(ひとめ)も草(くさ)も かれぬと思(おも)へば",
       "rhythm": "44444!64444444!6444444444444",
       "hasKigo": true,
       "kigo": "冬",
-      "kigoStart": 4,
-      "kigoEnd": 5,
-      "explanation": "「冬」は冬の季語。山里の人も草木も、すべてが枯れた寂しさを詠んだ句です。",
+      "kigoStart": 3,
+      "kigoEnd": 4,
+      "explanation": "山里の人も草木も、すべてが枯れた寂しさを詠んだ句です。",
       "note": "",
-      "tags": ["冬","百人一首","有名句"],
+      "tags": [
+        "冬",
+        "百人一首",
+        "有名句"
+      ],
       "grade": 1,
       "displayRuby": true
     },
@@ -183,9 +214,12 @@
       "kigo": "夏河",
       "kigoStart": 0,
       "kigoEnd": 2,
-      "explanation": "「夏河」は夏の季語。涼やかな情景と旅情を表しています。",
+      "explanation": "涼やかな情景と旅情を表しています。",
       "note": "",
-      "tags": ["夏","有名句"],
+      "tags": [
+        "夏",
+        "有名句"
+      ],
       "grade": 2,
       "displayRuby": true
     },
@@ -198,11 +232,14 @@
       "rhythm": "44444!64444444!64444444",
       "hasKigo": true,
       "kigo": "秋の暮",
-      "kigoStart": 14,
-      "kigoEnd": 17,
-      "explanation": "「秋の暮」は秋の季語。静けさと寂寥を詠んだ名句です。",
+      "kigoStart": 10,
+      "kigoEnd": 13,
+      "explanation": "静けさと寂寥を詠んだ名句です。",
       "note": "",
-      "tags": ["秋","有名句"],
+      "tags": [
+        "秋",
+        "有名句"
+      ],
       "grade": 2,
       "displayRuby": true
     },
@@ -217,9 +254,12 @@
       "kigo": "寒菊",
       "kigoStart": 0,
       "kigoEnd": 2,
-      "explanation": "「寒菊」は冬の季語。寒中に咲く花の健気さを詠んでいます。",
+      "explanation": "寒中に咲く花の健気さを詠んでいます。",
       "note": "",
-      "tags": ["冬","有名句"],
+      "tags": [
+        "冬",
+        "有名句"
+      ],
       "grade": 2,
       "displayRuby": true
     },
@@ -234,9 +274,12 @@
       "kigo": "春",
       "kigoStart": 2,
       "kigoEnd": 3,
-      "explanation": "「春」は春の季語。去りゆく季節を惜しむ句です。",
+      "explanation": "去りゆく季節を惜しむ句です。",
       "note": "",
-      "tags": ["春","有名句"],
+      "tags": [
+        "春",
+        "有名句"
+      ],
       "grade": 2,
       "displayRuby": true
     },
@@ -244,16 +287,20 @@
       "id": "yama_kawa_001",
       "author": "春道列樹",
       "source": "古今和歌集",
-      "text": "山川に 風のかけたる しがらみは 流れもあへぬ 紅葉なりけり",
+      "text": "山川に 風のかけたる しがらみは ^流れもあへぬ 紅葉なりけり",
       "ruby": "山川(やまかわ)に 風(かぜ)のかけたる しがらみは 流(なが)れもあへぬ 紅葉(もみじ)なりけり",
       "rhythm": "5444444!54444444!544444!54444444!54444444",
       "hasKigo": true,
-      "kigo": "紅葉",
-      "kigoStart": 29,
-      "kigoEnd": 31,
-      "explanation": "「紅葉（もみじ）」は秋の季語。山川の流れに散る紅葉を、風が架けた“しがらみ（柵）”のように見立てた美しい秋の情景を詠んでいます。",
+      "kigo": "紅葉(もみじ)",
+      "kigoStart": 21,
+      "kigoEnd": 23,
+      "explanation": "山川の流れに散る紅葉を、風が架けた“しがらみ（柵）”のように*見立てた美しい秋の情景を詠んでいます。",
       "note": "",
-      "tags": ["秋","古典","有名句"],
+      "tags": [
+        "秋",
+        "古典",
+        "有名句"
+      ],
       "grade": 2,
       "displayRuby": true
     }

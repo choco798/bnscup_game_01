@@ -44,4 +44,6 @@ struct Problem
 	Problem() : hasKigo(false), kigoStart(-1), kigoEnd(-1)
 	{
 	}
+
+	String getSeason() const;
 };

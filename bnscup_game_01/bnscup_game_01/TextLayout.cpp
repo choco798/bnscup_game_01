@@ -28,7 +28,8 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	double text_x = 0.0;
 	double text_y = 0.0;
 	int32 index = 0;
-	int32 lineCount = 0;
+	int32 lineCount = 1;
+	int32 headPos = 1;
 
 	String token;
 
@@ -59,7 +60,17 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 
 			InsertBreakInText(text_y, text_x, lineWidth,
 							  static_cast<double>(localFont.height()),
-							  lineCount, breakablePositions);
+							  lineCount, headPos, breakablePositions);
+			continue;
+		}
+
+		// 強制y位置を3つ戻す
+		if (ch == U'^')
+		{
+			const int32 BackPos = 2;
+			text_y = static_cast<double>(localFont.height()) *
+					 (headPos - BackPos - 1);
+			headPos -= BackPos;
 			continue;
 		}
 
@@ -89,10 +100,12 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 			// 直前のスペースで改行
 			InsertBreakInText(text_y, text_x, lineWidth,
 							  static_cast<double>(localFont.height()),
-							  lineCount, breakablePositions);
+							  lineCount, headPos, breakablePositions);
 		}
 
+		const bool disp_space_box = false;
 		// スペースを 1 文字として位置進行（可視描画しないが矩形は持つ）
+		if (disp_space_box)
 		{
 			const auto gi = localFont.getGlyph(U' ');
 			RectF box{Arg::topLeft = Vec2{text_x, text_y}, gi.xAdvance,
@@ -125,11 +138,13 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 
 void TextLayouter::InsertBreakInText(
 	double& text_y, double& text_x, double lineWidth, double localFontY,
-	int32_t& lineCount, s3d::Array<size_t>& breakablePositions) const
+	int32_t& lineCount, int32_t& headPos,
+	s3d::Array<size_t>& breakablePositions) const
 {
 	// 改行処理
-	text_y = localFontY * lineCount * 0.5f;
+	text_y = localFontY * headPos;
 	text_x -= lineWidth;
 	breakablePositions.clear();
 	++lineCount;
+	++headPos;
 }

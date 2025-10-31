@@ -244,6 +244,10 @@ void GameScene::draw() const
 	if (m_showExplanation)
 	{
 		getData().renderer.drawExplanation(
+			getData().gameState.problems[getData().gameState.currentIndex].kigo,
+			getData()
+				.gameState.problems[getData().gameState.currentIndex]
+				.getSeason(),
 			getData()
 				.gameState.problems[getData().gameState.currentIndex]
 				.explanation);

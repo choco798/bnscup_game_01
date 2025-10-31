@@ -80,8 +80,35 @@ bool Problem::isRhythmValid() const
 	return hasDigit;
 }
 
+String Problem::getSeason() const
+{
+	if (tags.contains(U"春"))
+	{
+		return U"春";
+	}
+	if (tags.contains(U"夏"))
+	{
+		return U"夏";
+	}
+	if (tags.contains(U"秋"))
+	{
+		return U"秋";
+	}
+	if (tags.contains(U"冬"))
+	{
+		return U"冬";
+	}
+
+	return String();
+}
+
 bool Problem::isValid() const
 {
-	return isBasicDataValid() && isKigoValid() && isGradeValid() &&
-		   isRubyValid() && isRhythmValid();
+	bool is_valid = true;
+	is_valid &= isBasicDataValid();
+	is_valid &= isKigoValid();
+	is_valid &= isGradeValid();
+	is_valid &= isRubyValid();
+	is_valid &= isRhythmValid();
+	return is_valid;
 }
