@@ -58,7 +58,7 @@ void MoraRenderer::drawGuide(const RhythmLayoutSettings& layout,
 	if (!m_initialized) return;
 
 	// いまのライン
-	Line{layout.hitX, 40, layout.hitX, Scene::Height() - 40}.draw(
+	Line{layout.hitX, 200, layout.hitX, 400}.draw(
 		3, Palette::Orange);
 
 	// ベースライン

@@ -24,7 +24,15 @@ void ResultScene::update()
 		gameState.updateProgress();
 		if (gameState.canPromote())
 		{
+			String prevRankName = gameState.currentRankName();
+
 			gameState.updateRank();
+
+			// セーブ失敗時はエラーメッセージを表示
+			System::MessageBoxOK(U"昇格通知",
+								 U" {} から {} へ昇格しました！\nおめでとうございます！！！ "_fmt(
+									 gameState.currentRankName(), prevRankName),
+								 MessageBoxStyle::Info);
 		}
 
 		// セーブを実行（1回のみ）

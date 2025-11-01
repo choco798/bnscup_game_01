@@ -162,12 +162,16 @@ GameScene::GameScene(const InitData& init) : IScene(init)
 
 	m_noKigoBtn = ui::Button(U"季語なし", GameConstants::Fonts::KEY_GAME,
 							 GameConstants::UI::NO_KIGO_BUTTON_POS);
+	m_startStopBtn = ui::Button(U"開始/停止", GameConstants::Fonts::KEY_GAME,
+								GameConstants::UI::START_STOP_BUTTON_POS);
 }
 
 void GameScene::startProblem()
 {
 	m_showExplanation = false;
 	m_result = false;
+	m_hintGauge = 0.0;
+	m_hintCheckPoint = 0.0;
 
 	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
 	{
@@ -218,7 +222,7 @@ void GameScene::startProblem()
 
 		// BeatTransportをリセットして開始
 		m_beatTransport.reset();
-		m_beatTransport.start();
+		m_beatTransport.setPreRoll(0.5);
 		m_beatHitDetector.reset();
 	}
 }
@@ -231,7 +235,22 @@ void GameScene::update()
 		m_flowTime -=
 			Scene::DeltaTime() / GameConstants::UI::FLOW_TIME_DURATION;
 	}
-	m_noKigoBtn.update();
+
+	// チュートリアルに関しては特別扱い
+	const bool isTutorial = (getData().gameState.currentIndex == 0) &&
+							(getData().gameState.currentRankName() ==
+							 GameConstants::RankNames::getRankName(0));
+	const bool isMicTutorial = (getData().gameState.currentIndex == 1) &&
+							   (getData().gameState.currentRankName() ==
+								GameConstants::RankNames::getRankName(0));
+	if (!isTutorial && !isMicTutorial)
+	{
+		m_noKigoBtn.update();
+	}
+	if (m_rhythmModeActive)
+	{
+		m_startStopBtn.update();
+	}
 
 	const bool disableInput = getData().showHowToPlay;
 	if (disableInput)
@@ -270,8 +289,10 @@ void GameScene::draw() const
 	if (m_rhythmModeActive)
 	{
 		// 画面分割モード：左半分に俳句、右半分にリズム
-		drawGameContent();
 		drawRhythmContent();
+		renderTexture.draw(Scene::Width() * 0.5, 0);
+		drawGameContent();
+		drawHintGauge();
 	}
 	else
 	{
@@ -385,6 +406,14 @@ bool GameScene::isHitKigo() const
 
 void GameScene::handleClick()
 {
+	// チュートリアルに関しては特別扱い
+	const bool isTutorial = (getData().gameState.currentIndex == 0) &&
+							(getData().gameState.currentRankName() ==
+							 GameConstants::RankNames::getRankName(0));
+	const bool isMicTutorial = (getData().gameState.currentIndex == 1) &&
+							   (getData().gameState.currentRankName() ==
+								GameConstants::RankNames::getRankName(0));
+
 	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
 	{
 		return;
@@ -394,6 +423,20 @@ void GameScene::handleClick()
 
 	if (!MouseL.down())
 	{
+		return;
+	}
+
+	// 開始/停止ボタンのチェック
+	if (m_rhythmModeActive && m_startStopBtn.roundRect().mouseOver())
+	{
+		if (m_beatTransport.isRunning())
+		{
+			m_beatTransport.resume();
+		}
+		else
+		{
+			m_beatTransport.start();
+		}
 		return;
 	}
 
@@ -414,7 +457,8 @@ void GameScene::handleClick()
 	}
 
 	// 季語なしボタンの簡易チェック
-	if (m_noKigoBtn.roundRect().mouseOver())
+	const bool skipNoKigoBtn = isTutorial || isMicTutorial;
+	if (!skipNoKigoBtn && m_noKigoBtn.roundRect().mouseOver())
 	{
 		getData().gameState.answered = true;
 		m_result = (!prob.hasKigo);
@@ -500,13 +544,42 @@ void GameScene::updateRhythmMode()
 	// BeatTransport更新とBeatHitDetector処理
 	if (m_beatTransport.isRunning())
 	{
-		m_beatHitDetector.process(m_parsedStream, getCurrentBeat(),
-								  [this](size_t moraIndex)
-								  {
-									  (void)moraIndex;
-									  // ビートヒット時の処理（SE再生など）
-									  getData().sound.playCorrect();
-								  });
+		double level = m_voiceReactiveFx->level();
+		m_beatHitDetector.process(
+			m_parsedStream, getCurrentBeat(),
+			[level, this](size_t moraIndex)
+			{
+				(void)moraIndex;
+				// ビートヒット時の処理（SE再生など）
+				getData().sound.playRhythmBeat();
+
+				// ヒントゲージが溜まっていくのを実装する
+				m_hintGauge +=
+					level * GameConstants::Game::HINT_GAUGE_VOICE_BONUS;
+			});
+	}
+
+	// ヒントゲージが50%でイベント発生
+	if ((m_hintGauge > GameConstants::Game::HINT_GAUGE_HINT_POINT) &&
+		(m_hintCheckPoint == 0.0))
+	{
+		StartFlow(GameConstants::Game::HINT_GAUGE_HINT_POINT);
+		m_hintCheckPoint = GameConstants::Game::HINT_GAUGE_HINT_POINT;
+	}
+	// ヒントゲージ100%以降は毎回発生
+	if ((m_hintGauge > GameConstants::Game::HINT_GAUGE_MAN) &&
+		(m_hintGauge > m_hintCheckPoint))
+	{
+		m_hintGauge = GameConstants::Game::HINT_GAUGE_MAN - 1e-6;
+		StartFlow(GameConstants::Game::HINT_GAUGE_HINT_POINT);
+		m_hintCheckPoint = m_hintGauge;
+	}
+
+	// 譜面が最終タイミングまで来たら元に戻して、時間を止めるようにする
+	if (getCurrentBeat() > m_parsedStream.totalBeats)
+	{
+		m_beatTransport.reset();
+		m_beatHitDetector.reset();
 	}
 }
 
@@ -546,6 +619,9 @@ void GameScene::drawGameContent() const
 	const bool isTutorial = (getData().gameState.currentIndex == 0) &&
 							(getData().gameState.currentRankName() ==
 							 GameConstants::RankNames::getRankName(0));
+	const bool isMicTutorial = (getData().gameState.currentIndex == 1) &&
+							(getData().gameState.currentRankName() ==
+							 GameConstants::RankNames::getRankName(0));
 
 	if (m_showExplanation || isTutorial)
 	{
@@ -561,9 +637,11 @@ void GameScene::drawGameContent() const
 	// ミスクリック時に方向を示す
 	if (m_flowTime > 0.0f)
 	{
-		DrawFlowHintPastel(RectF(getData().configManager.ui().clientSizeX,
-								 getData().configManager.ui().clientSizeY),
-						   (m_flowStartPos - getKigoRectCenter()), m_flowTime);
+		DrawFlowHintPastel(
+			RectF(getData().configManager.ui().clientSizeX,
+				  getData().configManager.ui().clientSizeY),
+			(m_flowStartPos - getKigoRectCenter()), m_flowTime,
+			static_cast<size_t>(GameConstants::UI::FLOW_HINT_PARTICLE_COUNT * m_flowPower));
 	}
 
 	// 俳句本文（フリガナ対応）
@@ -578,8 +656,15 @@ void GameScene::drawGameContent() const
 		getData().renderer.drawHaiku(m_chars);
 	}
 
-	// 季語なしボタン（簡易）
-	m_noKigoBtn.draw();
+	if (!isTutorial && !isMicTutorial)
+	{
+		// 季語なしボタン（簡易）
+		m_noKigoBtn.draw();
+	}
+	if (m_rhythmModeActive)
+	{
+		m_startStopBtn.draw();
+	}
 
 	// 先生リアクション
 	if (!getData().gameState.answered)
@@ -616,10 +701,29 @@ void GameScene::drawGameContent() const
 		if (isTutorial)
 		{
 			getData().renderer.drawTutorial(
-				U"俳句の中の季語を見つけていく（クリックする）ゲームです。\n言"
-				U"葉の芯を楽しんでください！！！");
+				U"俳句の中の季語を見つけていく（クリックする）ゲームです\n"
+				U"言葉の芯を楽しんでください！！！");
+		}
+		else if (isMicTutorial)
+		{
+			getData().renderer.drawTutorial(
+				U"リズムにシンクロして、俳句を読み上げると、ヒントポイントが手に入る！\n"
+					  "ヒントポイントが一定以上溜まると、、、");
 		}
 	}
+
+	if (!isTutorial && !isMicTutorial)
+	{
+		// 現在スコアの表示
+		FontAsset(GameConstants::Fonts::KEY_EXPLANATION)(
+			U"スコア : {}"_fmt(getData().gameState.score))
+			.draw(Vec2(50.0, 20.0),
+				  Palette::Black)
+			.scaled(1.2)
+			.stretched(8)
+			.drawFrame(3.0, Palette::Black);
+	}
+
 }
 
 void GameScene::drawRhythmContent() const
@@ -629,9 +733,13 @@ void GameScene::drawRhythmContent() const
 		return;
 	}
 
+	const ScopedRenderTarget2D target{renderTexture};
+	const ScopedRenderStates2D blend{};
+	// 背景クリア
+	renderTexture.clear(Palette::White);
+
 	// 画面右半分にリズム表示
-	const RectF rhythmArea{Scene::Width() * 0.5, 0, Scene::Width() * 0.5,
-						   Scene::Height()};
+	const RectF rhythmArea{0, 0, Scene::Width() * 0.5, Scene::Height()};
 
 	// 背景
 	rhythmArea.draw(ColorF{0.95, 0.95, 1.0, 0.3});
@@ -666,11 +774,46 @@ void GameScene::drawRhythmContent() const
 	}
 }
 
+void GameScene::drawHintGauge() const
+{
+	FontAsset(GameConstants::Fonts::KEY_EXPLANATION)(U"ヒント")
+		.draw(GameConstants::UI::HINT_GAUGE_RECT.pos - Vec2(100.0, 20.0),
+			  Palette::Black);
+	GameConstants::UI::HINT_GAUGE_RECT.draw(Palette::White).draw(Palette::Lightgray)
+		.drawFrame(2.0, Palette::Gray);
+	// 現在容量
+	RectF HintBar(
+		GameConstants::UI::HINT_GAUGE_RECT.pos +
+			Vec2(GameConstants::UI::HINT_GAUGE_RECT.w * (1.0 - m_hintGauge), 0),
+		Vec2(GameConstants::UI::HINT_GAUGE_RECT.w * m_hintGauge,
+			 GameConstants::UI::HINT_GAUGE_RECT.h));
+	HintBar.draw(Palette::Yellow);
+	// 半分のところに線を入れる
+	RectF HintLine(GameConstants::UI::HINT_GAUGE_RECT.pos +
+					   Vec2(GameConstants::UI::HINT_GAUGE_RECT.w / 2.0, 0),
+				   Vec2(2.0, GameConstants::UI::HINT_GAUGE_RECT.h));
+	HintLine.draw(Palette::Yellowgreen);
+}
+
 void GameScene::ExecWrong()
 {
 	getData().sound.playWrong();
-	m_flowTime = GameConstants::UI::FLOW_TIME_RESET;
+
+	// 間違ったらヒントゲージを加算してスコアを削るようにする
+	m_hintGauge += GameConstants::Game::HINT_GAUGE_FAILED_BONUS;
+
+	if (!m_showExplanation)
+	{
+		getData().gameState.score = Max(
+			0, getData().gameState.score - GameConstants::SCORE_FIALED_BASE);
+	}
+}
+
+void GameScene::StartFlow(double flowPower)
+{
+	m_flowTime = GameConstants::UI::FLOW_TIME_RESET * flowPower;
 	m_flowStartPos = Cursor::Pos();
+	m_flowPower = flowPower;
 }
 
 void GameScene::ExecCorrect()

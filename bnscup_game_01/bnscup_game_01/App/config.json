@@ -13,7 +13,7 @@
     "vadBandHighHz": 6000.0,
     "vadBandLowHz": 80.0,
     "vadKOff": 0.3,
-    "vadKOn": 1.0,
+    "vadKOn": 0.5,
     "vadMinOffMs": 200,
     "vadMinOnMs": 80
   },

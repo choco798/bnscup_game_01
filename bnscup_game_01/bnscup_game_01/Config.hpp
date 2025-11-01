@@ -26,8 +26,8 @@ struct RhythmConfig
 
 	// VAD（Voice Activity Detection）パラメータ
 	double vadAlpha = 0.02;			// ノイズEMAの追従度
-	double vadKOn = 1.3;			// ON閾値倍率
-	double vadKOff = 0.8;			// OFF閾値倍率
+	double vadKOn = 1.0;			// ON閾値倍率
+	double vadKOff = 0.4;			// OFF閾値倍率
 	double vadAbsOn = 0.005;		// ON閾値絶対値
 	double vadAbsOff = 0.01;		// OFF閾値絶対値
 	double vadBandLowHz = 80.0;		// 人声帯域下限[Hz]

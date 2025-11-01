@@ -10,12 +10,19 @@ constexpr int32 DEFAULT_SELECTED_GRADE = -1;
 
 // === スコアリング ===
 constexpr int32 SCORE_MULTIPLIER_BASE = 10;
+constexpr int32 SCORE_FIALED_BASE = 5;
 constexpr int32 INITIAL_SCORE = 0;
 constexpr int32 INITIAL_CORRECT_COUNT = 0;
 
-// === ゲームパラメータ（サウンド） ===
+// === ゲームパラメータ ===
 namespace Game
 {
+constexpr double HINT_GAUGE_MIN = 0.0;
+constexpr double HINT_GAUGE_MAN = 1.0;
+constexpr double HINT_GAUGE_HINT_POINT = 0.5;
+constexpr double HINT_GAUGE_FAILED_BONUS = 0.2;
+constexpr double HINT_GAUGE_VOICE_BONUS = 0.10;
+// === サウンド ===
 constexpr double MIN_VOLUME = 0.0;
 constexpr double MAX_VOLUME = 1.0;
 }  // namespace Game
@@ -47,7 +54,9 @@ constexpr Vec2 CLOSE_BUTTON_OFFSET = Vec2{120, 44};
 
 // ゲーム画面のレイアウト
 constexpr Vec2 GAME_BASE_POSITION = Vec2{120, 60};	// 俳句表示の基準位置
-constexpr Vec2 NO_KIGO_BUTTON_POS = Vec2{960, 140};
+constexpr Vec2 START_STOP_BUTTON_POS = Vec2{800, 460};
+constexpr Vec2 NO_KIGO_BUTTON_POS = Vec2{500, 600};
+constexpr RectF HINT_GAUGE_RECT{800, 60, 300, 20};
 
 // 色とグラデーション
 constexpr ColorF BACKGROUND_COLOR = ColorF{0.95};
@@ -293,8 +302,8 @@ constexpr Vec2 BACK_BUTTON_POS{800, 600};
 // スライダー範囲
 constexpr double VAD_ALPHA_MIN = 0.01;
 constexpr double VAD_ALPHA_MAX = 0.11;
-constexpr double VAD_K_ON_MIN = 1.0;
-constexpr double VAD_K_ON_MAX = 2.0;
+constexpr double VAD_K_ON_MIN = 0.5;
+constexpr double VAD_K_ON_MAX = 2.5;
 constexpr double VAD_K_OFF_MIN = 0.3;
 constexpr double VAD_K_OFF_MAX = 1.3;
 }  // namespace OptionUI

@@ -99,7 +99,7 @@ template <class Fn>
 void BeatHitDetector::process(const ParsedStream& parsedStream, double nowBeat,
 							  Fn onHit)
 {
-	constexpr double eps = 1e-6;
+	constexpr double eps = 1e-2;
 	while (m_nextIndex < parsedStream.moras.size() &&
 		   parsedStream.moras[m_nextIndex].startBeat <= nowBeat + eps)
 	{

@@ -94,7 +94,7 @@ void RhythmOptionScene::updateSliders()
 		const double param_ratio = 1.0 - rhythm.micSensitivity / 2.0;
 		// 感度をまとめて調整できる便利パラメータ
 		rhythm.vadAlpha = 0.01 + param_ratio * 0.1;	 // 0.01-0.11 範囲
-		rhythm.vadKOn = 1.0 + param_ratio * 1.0;	 // 1.0-2.0 範囲
+		rhythm.vadKOn = 0.5 + param_ratio * 2.0;	 // 1.0-2.0 範囲
 		rhythm.vadKOff = 0.3 + param_ratio * 1.0;	 // 0.3-1.3 範囲
 
 		// スライダーも更新
