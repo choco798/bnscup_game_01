@@ -432,7 +432,7 @@ void GameScene::ExecCorrect()
 {
 	getData().sound.playCorrect();
 	// 連打したときに音は鳴らすけど、正解数カウントは上げないようにする
-	if (m_showExplanation)
+	if (!m_showExplanation)
 	{
 		getData().gameState.score +=
 			10 * (getData()
