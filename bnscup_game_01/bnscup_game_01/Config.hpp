@@ -18,6 +18,28 @@ struct AudioConfig
 	double seVolume = 0.8;	 // 0.0 - 1.0
 };
 
+struct RhythmConfig
+{
+	double bpm = 120.0;				// BPM設定
+	double micSensitivity = 0.5;	// マイク感度（0.0-1.0）
+	bool rhythmModeEnabled = true;	// リズムモード有効フラグ
+
+	// VAD（Voice Activity Detection）パラメータ
+	double vadAlpha = 0.02;			// ノイズEMAの追従度
+	double vadKOn = 1.3;			// ON閾値倍率
+	double vadKOff = 0.8;			// OFF閾値倍率
+	double vadAbsOn = 0.005;		// ON閾値絶対値
+	double vadAbsOff = 0.01;		// OFF閾値絶対値
+	double vadBandLowHz = 80.0;		// 人声帯域下限[Hz]
+	double vadBandHighHz = 6000.0;	// 人声帯域上限[Hz]
+	int32 vadMinOnMs = 80;			// 声あり最小継続時間[ms]
+	int32 vadMinOffMs = 200;		// 無音最小継続時間[ms]
+
+	// JSONシリアライズ用
+	void serialize(JSON& json) const;
+	void deserialize(const JSON& json);
+};
+
 struct SaveData
 {
 	size_t rankIndex = 0;				   // 現在の段位

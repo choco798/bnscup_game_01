@@ -199,6 +199,9 @@ constexpr StringView PROBLEM_FILE_LOAD_FAILED =
 constexpr StringView JSON_PARSE_FAILED = U"JSONファイルの解析に失敗しました";
 constexpr StringView FILE_NOT_FOUND = U"ファイルが見つかりません";
 constexpr StringView MISSING_PROBLEMS_KEY = U"JSONに'problems'キーがありません";
+constexpr StringView MICROPHONE_INIT_FAILED = U"マイクの初期化に失敗しました";
+constexpr StringView VAD_LOG_FILE_FAILED =
+	U"VADログファイルの作成に失敗しました";
 }  // namespace ErrorMessages
 
 // === ゲームプレイ設定 ===
@@ -225,4 +228,54 @@ inline String getRankName(size_t index)
 
 constexpr size_t RANK_COUNT = 4;
 }  // namespace RankNames
+
+// === リズムモード設定 ===
+namespace Rhythm
+{
+// RestPreset相当の設定
+constexpr int32 LIGHT_CUT_BEATS = 1;   // |
+constexpr int32 STRONG_CUT_BEATS = 2;  // ||
+constexpr int32 FERMATA_BEATS = 1;	   // ~（余韻）
+constexpr int32 TAIL_END_BEATS = 2;	   // 末尾の余韻
+
+// Layout設定
+constexpr double LANE_Y = 300.0;	   // ベース線Y座標
+constexpr double PX_PER_BEAT = 160.0;  // 1拍の横幅
+constexpr double HIT_X = 240.0;		   // 基準線X座標
+constexpr double MORA_RADIUS = 12.0;   // モーラ玉の半径
+constexpr double BEAM_Y = 10.0;		   // ビーム縦位置オフセット
+
+// フォントキー
+constexpr StringView KEY_KANA_BIG = U"RhythmKanaBig";
+constexpr StringView KEY_KANA_SMALL = U"RhythmKanaSmall";
+constexpr StringView KEY_UI_SMALL = U"RhythmUISmall";
+
+// フォントサイズ
+constexpr int32 SIZE_KANA_BIG = 20;
+constexpr int32 SIZE_KANA_SMALL = 16;
+constexpr int32 SIZE_UI_SMALL = 18;
+
+// VAD（Voice Activity Detection）設定
+constexpr double VAD_ALPHA = 0.02;			 // ノイズEMAの追従度
+constexpr double VAD_K_ON = 1.3;			 // ON閾値倍率
+constexpr double VAD_K_OFF = 0.8;			 // OFF閾値倍率
+constexpr double VAD_ABS_ON = 0.005;		 // ON閾値絶対値
+constexpr double VAD_ABS_OFF = 0.01;		 // OFF閾値絶対値
+constexpr double VAD_BAND_LOW_HZ = 80.0;	 // 人声帯域下限
+constexpr double VAD_BAND_HIGH_HZ = 6000.0;	 // 人声帯域上限
+constexpr int32 VAD_MIN_ON_MS = 80;			 // 声あり最小継続時間
+constexpr int32 VAD_MIN_OFF_MS = 200;		 // 無音最小継続時間
+
+// デフォルト俳句データ
+constexpr StringView DEFAULT_KANA_STREAM =
+	U"きゃ=れ=え=だ=に | か=ら=す の と=ま=り~ け=り~ || あ=き の く=れ~";
+
+// デフォルトBPM
+constexpr double DEFAULT_BPM = 120.0;
+
+// 描画関連定数
+constexpr double FLOW_TIME_DURATION = 3.0;	// フロー効果持続時間
+constexpr ColorF GLOW_COLOR_BASE =
+	ColorF{1.0, 0.9, 0.6, 0.35};  // グローエフェクト基本色
+}  // namespace Rhythm
 }  // namespace GameConstants

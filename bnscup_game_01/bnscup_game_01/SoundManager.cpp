@@ -64,3 +64,18 @@ double SoundManager::getSeVolume() const noexcept
 {
 	return m_seVolume;
 }
+
+void SoundManager::loadRhythmAssets()
+{
+	// リズム用SE読み込み（音楽的なビート音）
+	// 現在は既存のcorrect1.mp3を使用、専用音源があれば差し替え可能
+	m_rhythmSe = Audio{U"bgm_se/notes.wav"};
+}
+
+void SoundManager::playRhythmBeat()
+{
+	if (m_rhythmSe)
+	{
+		m_rhythmSe.playOneShot(m_seVolume * 0.7);  // 少し音量を下げる
+	}
+}

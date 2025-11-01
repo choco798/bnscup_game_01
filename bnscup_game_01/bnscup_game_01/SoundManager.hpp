@@ -6,6 +6,7 @@ class SoundManager
 	Audio m_bgm;
 	Audio m_seCorrect;
 	Audio m_seWrong;
+	Audio m_rhythmSe;  // リズム用SE
 	double m_bgmVolume = 0.6;
 	double m_seVolume = 0.8;
 
@@ -15,6 +16,10 @@ class SoundManager
 	void stopBGM();
 	void playCorrect();
 	void playWrong();
+
+	// リズム機能追加
+	void loadRhythmAssets();  // リズム用音声読み込み
+	void playRhythmBeat();	  // ビート音再生
 
 	// 追加: 音量制御（0.0 - 1.0）
 	void setBgmVolume(double v);

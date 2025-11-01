@@ -121,10 +121,14 @@
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="HowToPlay.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MoraSystem.cpp" />
     <ClCompile Include="Problem.cpp" />
     <ClCompile Include="ProblemManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResultScene.cpp" />
+    <ClCompile Include="RhythmOptionScene.cpp" />
+    <ClCompile Include="RhythmRenderer.cpp" />
+    <ClCompile Include="RhythmRenderer.hpp" />
     <ClCompile Include="SaveDataManager.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -134,6 +138,7 @@
     <ClCompile Include="TextLayout.cpp" />
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="UiButton.cpp" />
+    <ClCompile Include="VoiceDetector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\engine\texture\box-shadow\128.png" />
@@ -345,10 +350,12 @@
     <ClInclude Include="GameScene.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="HowToPlay.hpp" />
+    <ClInclude Include="MoraSystem.hpp" />
     <ClInclude Include="Problem.hpp" />
     <ClInclude Include="ProblemManager.hpp" />
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="ResultScene.hpp" />
+    <ClInclude Include="RhythmOptionScene.hpp" />
     <ClInclude Include="SaveDataManager.hpp" />
     <ClInclude Include="SceneBase.hpp" />
     <ClInclude Include="SoundManager.hpp" />
@@ -356,6 +363,7 @@
     <ClInclude Include="TextLayout.hpp" />
     <ClInclude Include="TitleScene.hpp" />
     <ClInclude Include="UiButton.hpp" />
+    <ClInclude Include="VoiceDetector.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App\example\obj\blacksmith.obj">
