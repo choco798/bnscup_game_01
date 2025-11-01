@@ -278,5 +278,24 @@ constexpr double DEFAULT_BPM = 120.0;
 constexpr double FLOW_TIME_DURATION = 3.0;	// フロー効果持続時間
 constexpr ColorF GLOW_COLOR_BASE =
 	ColorF{1.0, 0.9, 0.6, 0.35};  // グローエフェクト基本色
+
+// RhythmOptionScene UI定数
+namespace OptionUI
+{
+constexpr Vec2 SLIDER_SIZE{400, 20};
+constexpr Vec2 MIC_SENSITIVITY_POS{200, 240};
+constexpr Vec2 VAD_ALPHA_POS{200, 320};
+constexpr Vec2 VAD_K_ON_POS{200, 400};
+constexpr Vec2 VAD_K_OFF_POS{200, 480};
+constexpr Vec2 BACK_BUTTON_POS{800, 600};
+
+// スライダー範囲
+constexpr double VAD_ALPHA_MIN = 0.01;
+constexpr double VAD_ALPHA_MAX = 0.11;
+constexpr double VAD_K_ON_MIN = 1.0;
+constexpr double VAD_K_ON_MAX = 2.0;
+constexpr double VAD_K_OFF_MIN = 0.3;
+constexpr double VAD_K_OFF_MAX = 1.3;
+}  // namespace OptionUI
 }  // namespace Rhythm
 }  // namespace GameConstants

@@ -1,7 +1,7 @@
 ﻿{
   "audio": {
-    "bgmVolume": 0.5861111111111111,
-    "seVolume": 0.8
+    "bgmVolume": 0.4,
+    "seVolume": 0.8444444444444444
   },
   "rhythm": {
     "bpm": 120.0,

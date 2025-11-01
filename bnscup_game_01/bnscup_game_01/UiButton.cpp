@@ -1,7 +1,7 @@
 ﻿#include "UiButton.hpp"
 
 ui::Button::Button(const StringView& text, const StringView& fontAssetKey,
-						  const Vec2& pos)
+				   const Vec2& pos)
 	: m_text(text), m_fontKey(fontAssetKey), m_pos(pos)
 {
 	update();
@@ -98,9 +98,9 @@ void ui::Button::draw() const
 
 	m_rect.draw(fill).drawFrame(m_style.frameThickness, 0, m_style.colorFrame);
 
-	FontAsset(m_fontKey)(m_text).drawAt(m_pos, (m_state == ButtonState::Disabled)
-												 ? m_style.textDisabled
-												 : m_style.textColor);
+	FontAsset(m_fontKey)(m_text).drawAt(
+		m_pos, (m_state == ButtonState::Disabled) ? m_style.textDisabled
+												  : m_style.textColor);
 }
 
 // ユースケースによっては状態や領域を外から参照したいことも
@@ -117,4 +117,107 @@ ui::ButtonState ui::Button::state() const
 bool ui::Button::isClicked() const
 {
 	return m_preFrameClicked;
+}
+
+// === Slider implementation ===
+
+ui::Slider::Slider(const RectF& trackRect, double minValue, double maxValue)
+	: m_trackRect(trackRect), m_minValue(minValue), m_maxValue(maxValue)
+{
+}
+
+ui::Slider& ui::Slider::setTrackRect(const RectF& rect)
+{
+	m_trackRect = rect;
+	return *this;
+}
+
+ui::Slider& ui::Slider::setValue(double value)
+{
+	m_value = Clamp(value, m_minValue, m_maxValue);
+	return *this;
+}
+
+ui::Slider& ui::Slider::setRange(double minValue, double maxValue)
+{
+	m_minValue = minValue;
+	m_maxValue = maxValue;
+	m_value = Clamp(m_value, m_minValue, m_maxValue);
+	return *this;
+}
+
+ui::Slider& ui::Slider::setStyle(const SliderStyle& style)
+{
+	m_style = style;
+	return *this;
+}
+
+bool ui::Slider::update()
+{
+	const Circle knob = getKnobCircle();
+
+	// ドラッグ開始
+	if (knob.leftClicked() || (m_trackRect.leftClicked() && !m_dragging))
+	{
+		m_dragging = true;
+	}
+
+	// ドラッグ終了
+	if (MouseL.up())
+	{
+		m_dragging = false;
+	}
+
+	// ドラッグ中の値更新
+	if (m_dragging)
+	{
+		const double ratio =
+			Saturate((Cursor::PosF().x - m_trackRect.x) / m_trackRect.w);
+		setNormalizedValue(ratio);
+		return true;
+	}
+
+	return false;
+}
+
+void ui::Slider::draw() const
+{
+	// トラック描画
+	m_trackRect.rounded(m_style.cornerRadius)
+		.draw(m_dragging ? m_style.colorTrackDrag : m_style.colorTrack)
+		.drawFrame(m_style.frameThickness, 0, m_style.colorFrame);
+
+	// ノブ描画
+	const Circle knob = getKnobCircle();
+	knob.draw(m_dragging ? m_style.colorKnobDrag : m_style.colorKnob)
+		.drawFrame(m_style.frameThickness, 0, m_style.colorFrame);
+}
+
+double ui::Slider::getValue() const
+{
+	return m_value;
+}
+
+bool ui::Slider::isDragging() const
+{
+	return m_dragging;
+}
+
+double ui::Slider::normalizedValue() const
+{
+	if (m_maxValue <= m_minValue) return 0.0;
+	return (m_value - m_minValue) / (m_maxValue - m_minValue);
+}
+
+void ui::Slider::setNormalizedValue(double normalized)
+{
+	const double value = m_minValue + normalized * (m_maxValue - m_minValue);
+	setValue(value);
+}
+
+Circle ui::Slider::getKnobCircle() const
+{
+	const double x = m_trackRect.x + normalizedValue() * m_trackRect.w;
+	const double y = m_trackRect.center().y;
+	return Circle{x, y, m_style.knobRadius};
 }

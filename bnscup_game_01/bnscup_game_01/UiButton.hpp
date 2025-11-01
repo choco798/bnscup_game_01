@@ -69,4 +69,53 @@ class Button
 	bool m_pressedOriginInside = false;
 	bool m_preFrameClicked = false;
 };
+
+struct SliderStyle
+{
+	// 見た目
+	double cornerRadius = 8.0;
+	int32 frameThickness = 2;
+	double knobRadius = 12.0;
+
+	// 色
+	ColorF colorTrack = Palette::Lightgray;
+	ColorF colorTrackDrag = Palette::Gray;
+	ColorF colorKnob = Palette::Gray;
+	ColorF colorKnobDrag = Palette::Orange;
+	ColorF colorFrame = Palette::Black;
+};
+
+class Slider
+{
+   public:
+	Slider(const RectF& trackRect = RectF{0, 0, 200, 20}, double minValue = 0.0,
+		   double maxValue = 1.0);
+
+	// 設定
+	Slider& setTrackRect(const RectF& rect);
+	Slider& setValue(double value);
+	Slider& setRange(double minValue, double maxValue);
+	Slider& setStyle(const SliderStyle& style);
+
+	// 更新・描画
+	bool update();
+	void draw() const;
+
+	// 取得
+	double getValue() const;
+	bool isDragging() const;
+
+   private:
+	RectF m_trackRect;
+	double m_value = 0.0;
+	double m_minValue = 0.0;
+	double m_maxValue = 1.0;
+	SliderStyle m_style{};
+	bool m_dragging = false;
+
+	double normalizedValue() const;
+	void setNormalizedValue(double normalized);
+	Circle getKnobCircle() const;
+};
+
 }  // namespace ui

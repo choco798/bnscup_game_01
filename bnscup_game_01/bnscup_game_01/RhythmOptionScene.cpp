@@ -1,15 +1,28 @@
 ﻿#include "RhythmOptionScene.hpp"
 #include "GameConstants.hpp"
 
+using namespace GameConstants::Rhythm::OptionUI;
+
 RhythmOptionScene::RhythmOptionScene(const InitData& init)
 	: IScene(init),
-	  m_backButton(U"戻る", GameConstants::Fonts::KEY_MENU, Vec2{800, 600})
+	  m_backButton(U"戻る", GameConstants::Fonts::KEY_MENU, BACK_BUTTON_POS)
 {
-	// UI配置設定
-	m_micSensitivitySlider = RectF{200, 240, 400, 20};
-	m_vadAlphaSlider = RectF{200, 320, 400, 20};
-	m_vadKOnSlider = RectF{200, 400, 400, 20};
-	m_vadKOffSlider = RectF{200, 480, 400, 20};
+	// スライダーの初期化
+	m_micSensitivitySlider.setTrackRect(RectF{MIC_SENSITIVITY_POS, SLIDER_SIZE})
+		.setRange(0.0, 2.0)
+		.setValue(getData().configManager.rhythm().micSensitivity);
+
+	m_vadAlphaSlider.setTrackRect(RectF{VAD_ALPHA_POS, SLIDER_SIZE})
+		.setRange(VAD_ALPHA_MIN, VAD_ALPHA_MAX)
+		.setValue(getData().configManager.rhythm().vadAlpha);
+
+	m_vadKOnSlider.setTrackRect(RectF{VAD_K_ON_POS, SLIDER_SIZE})
+		.setRange(VAD_K_ON_MIN, VAD_K_ON_MAX)
+		.setValue(getData().configManager.rhythm().vadKOn);
+
+	m_vadKOffSlider.setTrackRect(RectF{VAD_K_OFF_POS, SLIDER_SIZE})
+		.setRange(VAD_K_OFF_MIN, VAD_K_OFF_MAX)
+		.setValue(getData().configManager.rhythm().vadKOff);
 
 	// マイク初期化試行
 	initializeVoiceDetector();
@@ -51,14 +64,14 @@ void RhythmOptionScene::update()
 	m_backButton.update();
 
 	// 戻るボタン
-	if (m_backButton.isClicked())
+	if (m_backButton.isClicked() || KeyEscape.down())
 	{
 		changeScene(State::Title);
 		return;
 	}
 
-	// マイク感度調整
-	updateMicSensitivity();
+	// スライダー更新
+	updateSliders();
 
 	// VADパラメータ更新
 	updateVADParameters();
@@ -70,105 +83,44 @@ void RhythmOptionScene::update()
 	}
 }
 
-void RhythmOptionScene::updateMicSensitivity()
+void RhythmOptionScene::updateSliders()
 {
-	const auto& cursor = Cursor::Pos();
+	auto& rhythm = getData().configManager.rhythm();
 
-	// マイク感度スライダー
-	if (m_micSensitivitySlider.leftClicked())
+	if (m_micSensitivitySlider.update())
 	{
-		m_micSensitivityDragging = true;
+		rhythm.micSensitivity = m_micSensitivitySlider.getValue();
+
+		const double param_ratio = 1.0 - rhythm.micSensitivity / 2.0;
+		// 感度をまとめて調整できる便利パラメータ
+		rhythm.vadAlpha = 0.01 + param_ratio * 0.1;	 // 0.01-0.11 範囲
+		rhythm.vadKOn = 1.0 + param_ratio * 1.0;	 // 1.0-2.0 範囲
+		rhythm.vadKOff = 0.3 + param_ratio * 1.0;	 // 0.3-1.3 範囲
+
+		// スライダーも更新
+		m_vadAlphaSlider.setValue(rhythm.vadAlpha);
+		m_vadKOnSlider.setValue(rhythm.vadKOn);
+		m_vadKOffSlider.setValue(rhythm.vadKOff);
 	}
 
-	if (m_micSensitivityDragging)
+	if (m_vadAlphaSlider.update())
 	{
-		if (MouseL.up())
-		{
-			m_micSensitivityDragging = false;
-		}
-		else
-		{
-			const double ratio =
-				Saturate((cursor.x - m_micSensitivitySlider.x) /
-						 m_micSensitivitySlider.w);
-			getData().configManager.rhythm().micSensitivity = ratio * 2.0;
+		rhythm.vadAlpha = m_vadAlphaSlider.getValue();
+	}
 
-			const double param_ratio = 1.0 - ratio;
-			// 感度はまとめて調整できる便利パラメータ
-			getData().configManager.rhythm().vadAlpha =
-				0.01 + param_ratio * 0.1;  // 0.01-0.11 範囲
-			getData().configManager.rhythm().vadKOn =
-				1.0 + param_ratio * 1.0;  // 1.0-2.0 範囲
-			getData().configManager.rhythm().vadKOff =
-				0.3 + param_ratio * 1.0;  // 0.3-1.3 範囲
-		}
+	if (m_vadKOnSlider.update())
+	{
+		rhythm.vadKOn = m_vadKOnSlider.getValue();
+	}
+
+	if (m_vadKOffSlider.update())
+	{
+		rhythm.vadKOff = m_vadKOffSlider.getValue();
 	}
 }
 
 void RhythmOptionScene::updateVADParameters()
 {
-	const auto& cursor = Cursor::Pos();
-
-	// VAD Alpha スライダー
-	if (m_vadAlphaSlider.leftClicked())
-	{
-		m_vadAlphaDragging = true;
-	}
-	if (m_vadAlphaDragging)
-	{
-		if (MouseL.up())
-		{
-			m_vadAlphaDragging = false;
-		}
-		else
-		{
-			const double ratio =
-				Saturate((cursor.x - m_vadAlphaSlider.x) / m_vadAlphaSlider.w);
-			getData().configManager.rhythm().vadAlpha =
-				0.01 + ratio * 0.1;	 // 0.01-0.11 範囲
-		}
-	}
-
-	// VAD K_ON スライダー
-	if (m_vadKOnSlider.leftClicked())
-	{
-		m_vadKOnDragging = true;
-	}
-	if (m_vadKOnDragging)
-	{
-		if (MouseL.up())
-		{
-			m_vadKOnDragging = false;
-		}
-		else
-		{
-			const double ratio =
-				Saturate((cursor.x - m_vadKOnSlider.x) / m_vadKOnSlider.w);
-			getData().configManager.rhythm().vadKOn =
-				1.0 + ratio * 2.0;	// 1.0-3.0 範囲
-		}
-	}
-
-	// VAD K_OFF スライダー
-	if (m_vadKOffSlider.leftClicked())
-	{
-		m_vadKOffDragging = true;
-	}
-	if (m_vadKOffDragging)
-	{
-		if (MouseL.up())
-		{
-			m_vadKOffDragging = false;
-		}
-		else
-		{
-			const double ratio =
-				Saturate((cursor.x - m_vadKOffSlider.x) / m_vadKOffSlider.w);
-			getData().configManager.rhythm().vadKOff =
-				0.3 + ratio * 1.0;	// 0.3-1.3 範囲
-		}
-	}
-
 	// パラメータをVADに反映
 	if (m_voiceDetector)
 	{
@@ -201,11 +153,8 @@ void RhythmOptionScene::draw() const
 	FontAsset(GameConstants::Fonts::KEY_EXPLANATION)(m_statusMessage)
 		.draw(50, 120, m_micInitialized ? Palette::Green : Palette::Red);
 
-	// マイク設定
-	drawMicrophoneSettings();
-
-	// VAD設定
-	drawVADSettings();
+	// スライダー描画
+	drawSliders();
 
 	// マイク可視化
 	if (m_micInitialized)
@@ -214,66 +163,33 @@ void RhythmOptionScene::draw() const
 	}
 
 	// 戻るボタン
-	drawBackButton();
+	m_backButton.draw();
 }
 
-void RhythmOptionScene::drawMicrophoneSettings() const
+void RhythmOptionScene::drawSliders() const
 {
 	using namespace GameConstants::Fonts;
+	const auto& rhythm = getData().configManager.rhythm();
 
 	// マイク感度
-	const auto& rhythm = getData().configManager.rhythm();
 	FontAsset(KEY_EXPLANATION)(U"マイク感度: {:.2f}"_fmt(rhythm.micSensitivity))
-		.draw(50, 180, Palette::Black);
-
-	// スライダー背景
-	m_micSensitivitySlider.draw(m_micSensitivityDragging
-									? Palette::Gray : Palette::Lightgray);
-
-	// スライダーハンドル
-	const double handleX = m_micSensitivitySlider.x +
-						   rhythm.micSensitivity / 2.0 * m_micSensitivitySlider.w;
-	Circle{handleX, m_micSensitivitySlider.center().y, 12}.draw(
-		m_micSensitivityDragging ? Palette::Orange : Palette::Gray);
-}
-
-void RhythmOptionScene::drawVADSettings() const
-{
-	using namespace GameConstants::Fonts;
-	const auto& rhythm = getData().configManager.rhythm();
+		.draw(50, MIC_SENSITIVITY_POS.y - 60, Palette::Black);
+	m_micSensitivitySlider.draw();
 
 	// VAD Alpha
 	FontAsset(KEY_EXPLANATION)(U"ノイズ追従度: {:.3f}"_fmt(rhythm.vadAlpha))
-		.draw(50, 260, Palette::Black);
-
-	m_vadAlphaSlider.draw(m_vadAlphaDragging ? Palette::Gray
-											 : Palette::Lightgray);
-	const double alphaRatio = (rhythm.vadAlpha - 0.01) / 0.1;
-	const double alphaHandleX =
-		m_vadAlphaSlider.x + alphaRatio * m_vadAlphaSlider.w;
-	Circle{alphaHandleX, m_vadAlphaSlider.center().y, 12}.draw(
-		m_vadAlphaDragging ? Palette::Orange : Palette::Gray);
+		.draw(50, VAD_ALPHA_POS.y - 60, Palette::Black);
+	m_vadAlphaSlider.draw();
 
 	// VAD K_ON
 	FontAsset(KEY_EXPLANATION)(U"ON閾値倍率: {:.2f}"_fmt(rhythm.vadKOn))
-		.draw(50, 340, Palette::Black);
-
-	m_vadKOnSlider.draw(m_vadKOnDragging ? Palette::Gray : Palette::Lightgray);
-	const double onRatio = (rhythm.vadKOn - 1.0) / 1.0;
-	const double onHandleX = m_vadKOnSlider.x + onRatio * m_vadKOnSlider.w;
-	Circle{onHandleX, m_vadKOnSlider.center().y, 12}.draw(
-		m_vadKOnDragging ? Palette::Orange : Palette::Gray);
+		.draw(50, VAD_K_ON_POS.y - 60, Palette::Black);
+	m_vadKOnSlider.draw();
 
 	// VAD K_OFF
 	FontAsset(KEY_EXPLANATION)(U"OFF閾値倍率: {:.2f}"_fmt(rhythm.vadKOff))
-		.draw(50, 420, Palette::Black);
-
-	m_vadKOffSlider.draw(m_vadKOffDragging ? Palette::Gray
-										   : Palette::Lightgray);
-	const double offRatio = (rhythm.vadKOff - 0.3) / 1.0;
-	const double offHandleX = m_vadKOffSlider.x + offRatio * m_vadKOffSlider.w;
-	Circle{offHandleX, m_vadKOffSlider.center().y, 12}.draw(
-		m_vadKOffDragging ? Palette::Orange : Palette::Gray);
+		.draw(50, VAD_K_OFF_POS.y - 60, Palette::Black);
+	m_vadKOffSlider.draw();
 }
 
 void RhythmOptionScene::drawMicrophoneVisualization() const
@@ -289,9 +205,4 @@ void RhythmOptionScene::drawMicrophoneVisualization() const
 	{
 		detector->drawUI();
 	}
-}
-
-void RhythmOptionScene::drawBackButton() const
-{
-	m_backButton.draw();
 }
