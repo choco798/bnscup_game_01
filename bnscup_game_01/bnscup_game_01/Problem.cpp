@@ -43,41 +43,7 @@ bool Problem::isRhythmValid() const
 		return true;
 	}
 
-	// リズム情報の形式: "44444!64444444!644444"
-	// 数字(音の長さ)と!(休符)の組み合わせ
-	bool hasDigit = false;
-	bool wasExclamation = false;
-
-	for (const auto ch : rhythm)
-	{
-		if (InRange(ch, U'0', U'9'))
-		{
-			hasDigit = true;
-			wasExclamation = false;
-		}
-		else if (ch == U'!')
-		{
-			if (wasExclamation || !hasDigit)
-			{
-				// 連続した!または数字の前の!は無効
-				return false;
-			}
-			wasExclamation = true;
-		}
-		else
-		{
-			return false;  // 数字と!以外は無効
-		}
-	}
-
-	// 最後が!で終わっているのは無効
-	if (wasExclamation)
-	{
-		return false;
-	}
-
-	// 数字が1つも無いのは無効
-	return hasDigit;
+	return true;
 }
 
 String Problem::getSeason() const

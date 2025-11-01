@@ -195,9 +195,6 @@
     <ClCompile Include="VoiceDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RhythmRenderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="RhythmRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -921,6 +918,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VoiceDetector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RhythmRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

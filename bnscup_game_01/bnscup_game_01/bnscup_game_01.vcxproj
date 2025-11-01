@@ -75,6 +75,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <BuildStlModules>false</BuildStlModules>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -128,7 +129,6 @@
     <ClCompile Include="ResultScene.cpp" />
     <ClCompile Include="RhythmOptionScene.cpp" />
     <ClCompile Include="RhythmRenderer.cpp" />
-    <ClCompile Include="RhythmRenderer.hpp" />
     <ClCompile Include="SaveDataManager.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -356,6 +356,7 @@
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="ResultScene.hpp" />
     <ClInclude Include="RhythmOptionScene.hpp" />
+    <ClInclude Include="RhythmRenderer.hpp" />
     <ClInclude Include="SaveDataManager.hpp" />
     <ClInclude Include="SceneBase.hpp" />
     <ClInclude Include="SoundManager.hpp" />

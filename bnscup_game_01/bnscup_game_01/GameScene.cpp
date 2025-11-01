@@ -154,6 +154,10 @@ void DrawFlowHintPastel(
 GameScene::GameScene(const InitData& init) : IScene(init)
 {
 	getData().sound.stopBGM();
+
+	// リズムモード初期化
+	initializeRhythmMode();
+
 	startProblem();
 
 	m_noKigoBtn = ui::Button(U"季語なし", GameConstants::Fonts::KEY_GAME,
@@ -173,9 +177,12 @@ void GameScene::startProblem()
 	const auto& ui = getData().configManager.ui();
 	const auto& problem =
 		getData().gameState.problems[getData().gameState.currentIndex];
-	TextLayouter layouter{GameConstants::Fonts::KEY_GAME, ui.maxLineWidth,
-						  ui.lineHeightScale, ui.lineWidthScale,
-						  static_cast<double>(ui.clientSizeX)};
+
+	// 画面分割対応：左半分のサイズで計算
+	const double halfWidth = static_cast<double>(ui.clientSizeX) * 0.5;
+	TextLayouter layouter{GameConstants::Fonts::KEY_GAME,
+						  Min(ui.maxLineWidth, halfWidth - 40),
+						  ui.lineHeightScale, ui.lineWidthScale, halfWidth};
 
 	// フリガナ表示が有効な場合はlayoutWithRubyを使用
 	if (problem.displayRuby && !problem.ruby.isEmpty())
@@ -201,6 +208,19 @@ void GameScene::startProblem()
 		c.rubyPos += base;
 		c.box.moveBy(base);
 	}
+
+	// リズムモード：モーラデータの解析
+	if (m_rhythmModeActive && !problem.rhythm.isEmpty())
+	{
+		// モーラストリームをパース
+		RestPreset restPreset;
+		m_parsedStream = KanaStreamParser::Parse(problem.rhythm, restPreset);
+
+		// BeatTransportをリセットして開始
+		m_beatTransport.reset();
+		m_beatTransport.start();
+		m_beatHitDetector.reset();
+	}
 }
 
 void GameScene::update()
@@ -217,6 +237,12 @@ void GameScene::update()
 	if (disableInput)
 	{
 		return;
+	}
+
+	// リズムモード更新
+	if (m_rhythmModeActive)
+	{
+		updateRhythmMode();
 	}
 
 	handleClick();
@@ -241,83 +267,16 @@ void GameScene::draw() const
 		return;
 	}
 
-	// チュートリアルに関しては特別扱い
-	const bool isTutorial = (getData().gameState.currentIndex == 0) &&
-							(getData().gameState.currentRankName() ==
-							 GameConstants::RankNames::getRankName(0));
-
-	if (m_showExplanation || isTutorial)
+	if (m_rhythmModeActive)
 	{
-		// 季語をハイライトする
-		drawKigoRect();
+		// 画面分割モード：左半分に俳句、右半分にリズム
+		drawGameContent();
+		drawRhythmContent();
 	}
 	else
 	{
-		// 俳句の背景に色を付ける
-		drawHiakuRect();
-	}
-
-	// ミスクリック時に方向を示す
-	if (m_flowTime > 0.0f)
-	{
-		DrawFlowHintPastel(RectF(getData().configManager.ui().clientSizeX,
-								 getData().configManager.ui().clientSizeY),
-						   (m_flowStartPos - getKigoRectCenter()), m_flowTime);
-	}
-
-	// 俳句本文（フリガナ対応）
-	const auto& problem =
-		getData().gameState.problems[getData().gameState.currentIndex];
-	if (problem.displayRuby && !problem.ruby.isEmpty())
-	{
-		getData().renderer.drawHaikuWithRuby(m_chars);
-	}
-	else
-	{
-		getData().renderer.drawHaiku(m_chars);
-	}
-
-	// 季語なしボタン（簡易）
-	m_noKigoBtn.draw();
-
-	// 先生リアクション
-	if (!getData().gameState.answered)
-	{
-		getData().renderer.drawTeacherNormal();
-	}
-	else
-	{
-		if (m_result)
-		{
-			getData().renderer.drawTeacherHappy();
-		}
-		else
-		{
-			getData().renderer.drawTeacherAngry();
-		}
-	}
-
-	// 解説
-	if (m_showExplanation)
-	{
-		getData().renderer.drawExplanation(
-			getData().gameState.problems[getData().gameState.currentIndex].kigo,
-			getData()
-				.gameState.problems[getData().gameState.currentIndex]
-				.getSeason(),
-			getData()
-				.gameState.problems[getData().gameState.currentIndex]
-				.explanation);
-	}
-	else
-	{
-		// チュートリアルテキスト
-		if (isTutorial)
-		{
-			getData().renderer.drawTutorial(
-				U"俳句の中の季語を見つけていく（クリックする）ゲームです。\n言"
-				U"葉の芯を楽しんでください！！！");
-		}
+		// 従来の全画面表示
+		drawGameContent();
 	}
 }
 
@@ -480,6 +439,230 @@ void GameScene::handleClick()
 	{
 		// 何もないところをクリックすると間違い扱いにする
 		ExecWrong();
+	}
+}
+
+// リズム機能メソッド実装
+void GameScene::initializeRhythmMode()
+{
+	const auto& rhythmConfig = getData().configManager.rhythm();
+
+	// リズム機能が有効かチェック
+	m_rhythmModeActive = isRhythmModeEnabled();
+
+	if (!m_rhythmModeActive)
+	{
+		return;
+	}
+
+	// MoraRendererの初期化
+	m_moraRenderer = std::make_unique<MoraRenderer>();
+	if (!m_moraRenderer->initialize())
+	{
+		Print << U"Failed to initialize MoraRenderer";
+		m_rhythmModeActive = false;
+		return;
+	}
+
+	// VoiceReactiveFxの初期化
+	m_voiceReactiveFx = std::make_unique<VoiceReactiveFx>();
+
+	// VoiceDetectorの初期化
+	m_voiceDetector = std::make_unique<VoiceActivityDetector>();
+	if (!m_voiceDetector->initialize())
+	{
+		Print << U"Failed to initialize VoiceDetector - using dummy";
+		m_voiceDetector = std::make_unique<DummyVoiceActivityDetector>();
+		m_voiceDetector->initialize();
+	}
+
+	// パラメータ設定
+	VoiceActivityDetectorParams params;
+	params.alpha = rhythmConfig.micSensitivity;
+	m_voiceDetector->setParams(params);
+}
+
+void GameScene::updateRhythmMode()
+{
+	if (!m_rhythmModeActive || !m_voiceDetector || !m_voiceReactiveFx)
+	{
+		return;
+	}
+
+	// 音声検出更新
+	const bool voiceChanged = m_voiceDetector->update();
+	(void)voiceChanged;	 // 未使用警告回避
+	VoiceState voiceState = m_voiceDetector->state();
+
+	// 音声リアクティブエフェクト更新
+	m_voiceReactiveFx->update(voiceState, Scene::DeltaTime());
+
+	// BeatTransport更新とBeatHitDetector処理
+	if (m_beatTransport.isRunning())
+	{
+		m_beatHitDetector.process(m_parsedStream, getCurrentBeat(),
+								  [this](size_t moraIndex)
+								  {
+									  (void)moraIndex;
+									  // ビートヒット時の処理（SE再生など）
+									  getData().sound.playCorrect();
+								  });
+	}
+}
+
+void GameScene::drawRhythmMode() const
+{
+	// このメソッドは既存のdrawRhythmContent()と統合
+	drawRhythmContent();
+}
+
+bool GameScene::isRhythmModeEnabled() const
+{
+	// 現在の問題にリズムデータがあるかチェック
+	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
+	{
+		return false;
+	}
+
+	const auto& problem =
+		getData().gameState.problems[getData().gameState.currentIndex];
+	return !problem.rhythm.isEmpty();
+}
+
+double GameScene::getCurrentBeat() const
+{
+	return m_beatTransport.nowBeat();
+}
+
+void GameScene::drawGameContent() const
+{
+	// 画面分割時の左半分に俳句を描画
+	const RectF gameArea =
+		m_rhythmModeActive ? RectF{0, 0, Scene::Width() * 0.5, Scene::Height()}
+						   : RectF{0, 0, Scene::Width(), Scene::Height()};
+	(void)gameArea;	 // 未使用警告回避
+
+	// チュートリアルに関しては特別扱い
+	const bool isTutorial = (getData().gameState.currentIndex == 0) &&
+							(getData().gameState.currentRankName() ==
+							 GameConstants::RankNames::getRankName(0));
+
+	if (m_showExplanation || isTutorial)
+	{
+		// 季語をハイライトする
+		drawKigoRect();
+	}
+	else
+	{
+		// 俳句の背景に色を付ける
+		drawHiakuRect();
+	}
+
+	// ミスクリック時に方向を示す
+	if (m_flowTime > 0.0f)
+	{
+		DrawFlowHintPastel(RectF(getData().configManager.ui().clientSizeX,
+								 getData().configManager.ui().clientSizeY),
+						   (m_flowStartPos - getKigoRectCenter()), m_flowTime);
+	}
+
+	// 俳句本文（フリガナ対応）
+	const auto& problem =
+		getData().gameState.problems[getData().gameState.currentIndex];
+	if (problem.displayRuby && !problem.ruby.isEmpty())
+	{
+		getData().renderer.drawHaikuWithRuby(m_chars);
+	}
+	else
+	{
+		getData().renderer.drawHaiku(m_chars);
+	}
+
+	// 季語なしボタン（簡易）
+	m_noKigoBtn.draw();
+
+	// 先生リアクション
+	if (!getData().gameState.answered)
+	{
+		getData().renderer.drawTeacherNormal();
+	}
+	else
+	{
+		if (m_result)
+		{
+			getData().renderer.drawTeacherHappy();
+		}
+		else
+		{
+			getData().renderer.drawTeacherAngry();
+		}
+	}
+
+	// 解説
+	if (m_showExplanation)
+	{
+		getData().renderer.drawExplanation(
+			getData().gameState.problems[getData().gameState.currentIndex].kigo,
+			getData()
+				.gameState.problems[getData().gameState.currentIndex]
+				.getSeason(),
+			getData()
+				.gameState.problems[getData().gameState.currentIndex]
+				.explanation);
+	}
+	else
+	{
+		// チュートリアルテキスト
+		if (isTutorial)
+		{
+			getData().renderer.drawTutorial(
+				U"俳句の中の季語を見つけていく（クリックする）ゲームです。\n言"
+				U"葉の芯を楽しんでください！！！");
+		}
+	}
+}
+
+void GameScene::drawRhythmContent() const
+{
+	if (!m_rhythmModeActive || !m_moraRenderer || !m_voiceReactiveFx)
+	{
+		return;
+	}
+
+	// 画面右半分にリズム表示
+	const RectF rhythmArea{Scene::Width() * 0.5, 0, Scene::Width() * 0.5,
+						   Scene::Height()};
+
+	// 背景
+	rhythmArea.draw(ColorF{0.95, 0.95, 1.0, 0.3});
+
+	// リズム描画レイアウト設定
+	RhythmLayoutSettings layout;
+	layout.hitX = rhythmArea.x + rhythmArea.w * 0.3;  // 右側エリアの30%位置
+
+	// 現在の拍取得
+	const double currentBeat = getCurrentBeat();
+
+	// 音声レベル取得
+	const double voiceLevel = m_voiceReactiveFx->level();
+
+	// リズム描画
+	m_moraRenderer->drawGuide(layout, currentBeat);
+	m_moraRenderer->drawMoras(m_parsedStream, layout, currentBeat, voiceLevel);
+	m_moraRenderer->drawCuts(m_parsedStream, layout, currentBeat);
+
+	// デバッグ情報
+	if (GameConstants::Debug::IS_ENABLE && m_voiceDetector)
+	{
+		const VoiceState voiceState = m_voiceDetector->state();
+		(void)voiceState;  // 未使用警告回避
+		const Vec2 debugPos{rhythmArea.x + 20, rhythmArea.y + 20};
+		FontAsset(GameConstants::Fonts::KEY_GAME)(
+			U"Voice: {:.2f}"_fmt(voiceLevel))
+			.draw(debugPos, Palette::Black);
+		FontAsset(GameConstants::Fonts::KEY_GAME)(
+			U"Beat: {:.1f}"_fmt(currentBeat))
+			.draw(debugPos + Vec2{0, 30}, Palette::Black);
 	}
 }
 

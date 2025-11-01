@@ -181,6 +181,7 @@ constexpr StringView KEY_HOW_TO_PLAY = U"HowToPlay";
 constexpr StringView KEY_RESULT = U"Result";
 constexpr StringView KEY_SCORE = U"Score";
 constexpr StringView KEY_COPYRIGHT = U"Copyright";
+constexpr StringView KEY_DEBUG = U"Debug";
 }  // namespace Fonts
 
 // === ファイルパス ===
@@ -298,4 +299,9 @@ constexpr double VAD_K_OFF_MIN = 0.3;
 constexpr double VAD_K_OFF_MAX = 1.3;
 }  // namespace OptionUI
 }  // namespace Rhythm
+
+namespace Debug
+{
+constexpr bool IS_ENABLE = false;  // デバッグ情報表示フラグ
+}  // namespace Debug
 }  // namespace GameConstants

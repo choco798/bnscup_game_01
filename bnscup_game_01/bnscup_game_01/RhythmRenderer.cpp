@@ -4,7 +4,7 @@
 // ---- 描画ヘルパー関数実装 ----
 namespace RhythmDrawUtils
 {
-void DrawCut(double x, const RhythmLayout& layout, bool strong)
+void DrawCut(double x, const RhythmLayoutSettings& layout, bool strong)
 {
 	const double len = strong ? 90.0 : 70.0;
 	const double thick = strong ? 6.0 : 3.0;
@@ -12,7 +12,7 @@ void DrawCut(double x, const RhythmLayout& layout, bool strong)
 		thick, Color(0, 0, 0, 160));
 }
 
-void DrawBeam(double x1, double x2, const RhythmLayout& layout)
+void DrawBeam(double x1, double x2, const RhythmLayoutSettings& layout)
 {
 	if (x2 <= x1) return;
 	const double y = layout.laneY + layout.beamY;
@@ -20,7 +20,7 @@ void DrawBeam(double x1, double x2, const RhythmLayout& layout)
 	RectF{x1 + 6, y - h * 0.5, (x2 - x1) - 12, h}.draw(ColorF{0, 0, 0, 0.75});
 }
 
-void DrawFermata(double x, const RhythmLayout& layout)
+void DrawFermata(double x, const RhythmLayoutSettings& layout)
 {
 	const double r = layout.moraRadius + 8;
 	const Circle c{x, layout.laneY - (layout.moraRadius + 12), r};
@@ -41,7 +41,6 @@ bool MoraRenderer::initialize()
 		return true;
 	}
 
-
 	m_initialized = true;
 	return true;
 }
@@ -53,7 +52,7 @@ void MoraRenderer::finalize()
 	m_initialized = false;
 }
 
-void MoraRenderer::drawGuide(const RhythmLayout& layout,
+void MoraRenderer::drawGuide(const RhythmLayoutSettings& layout,
 							 double scrollBeat) const
 {
 	if (!m_initialized) return;
@@ -77,7 +76,8 @@ void MoraRenderer::drawGuide(const RhythmLayout& layout,
 }
 
 void MoraRenderer::drawCuts(const ParsedStream& parsedStream,
-							const RhythmLayout& layout, double scrollBeat) const
+							const RhythmLayoutSettings& layout,
+							double scrollBeat) const
 {
 	if (!m_initialized) return;
 
@@ -94,8 +94,8 @@ void MoraRenderer::drawCuts(const ParsedStream& parsedStream,
 }
 
 void MoraRenderer::drawMoras(const ParsedStream& parsedStream,
-							 const RhythmLayout& layout, double scrollBeat,
-							 double voiceLevel) const
+							 const RhythmLayoutSettings& layout,
+							 double scrollBeat, double voiceLevel) const
 {
 	if (!m_initialized) return;
 
@@ -123,8 +123,9 @@ void MoraRenderer::drawMoras(const ParsedStream& parsedStream,
 	}
 }
 
-void MoraRenderer::drawMoraGlyph(const Mora& mora, const RhythmLayout& layout,
-								 double x, const ColorF& glow) const
+void MoraRenderer::drawMoraGlyph(const Mora& mora,
+								 const RhythmLayoutSettings& layout, double x,
+								 const ColorF& glow) const
 {
 	using namespace GameConstants::Rhythm;
 

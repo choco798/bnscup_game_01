@@ -1,8 +1,11 @@
 ﻿#pragma once
 
 #include "Config.hpp"
+#include "MoraSystem.hpp"
+#include "RhythmRenderer.hpp"
 #include "SceneBase.hpp"
 #include "UiButton.hpp"
+#include "VoiceDetector.hpp"
 
 class GameScene : public KigoGameApp::Scene
 {
@@ -14,10 +17,26 @@ class GameScene : public KigoGameApp::Scene
 	Vec2 m_flowStartPos{};
 	ui::Button m_noKigoBtn;
 
+	// リズム機能関連
+	std::unique_ptr<MoraRenderer> m_moraRenderer;
+	std::unique_ptr<IVoiceActivityDetector> m_voiceDetector;
+	std::unique_ptr<VoiceReactiveFx> m_voiceReactiveFx;
+	BeatTransport m_beatTransport{120.0};  // 120 BPM
+	BeatHitDetector m_beatHitDetector;
+	ParsedStream m_parsedStream;
+	bool m_rhythmModeActive = false;
+
 	void handleClick();
 	void ExecWrong();
 	void ExecCorrect();
 	bool isHitKigo() const;
+
+	// リズム機能メソッド
+	void initializeRhythmMode();
+	void updateRhythmMode();
+	void drawRhythmMode() const;
+	bool isRhythmModeEnabled() const;
+	double getCurrentBeat() const;
 
    public:
 	GameScene(const InitData& init);
@@ -27,6 +46,8 @@ class GameScene : public KigoGameApp::Scene
 	void drawKigoRect() const;
 	void drawWordRect(s3d::int32 i, const UIConfig& ui) const;
 	void drawHiakuRect() const;
+	void drawGameContent() const;
+	void drawRhythmContent() const;
 	Vec2 getKigoRectCenter() const;
 	static RectF Inflate(const RectF& r, double padPx, double padScale);
 };
