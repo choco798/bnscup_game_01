@@ -46,7 +46,7 @@ constexpr Vec2 HELP_PANEL_SIZE = Vec2{1000, 440};
 constexpr Vec2 CLOSE_BUTTON_OFFSET = Vec2{120, 44};
 
 // ゲーム画面のレイアウト
-constexpr Vec2 GAME_BASE_POSITION = Vec2{640, 60};	// 俳句表示の基準位置
+constexpr Vec2 GAME_BASE_POSITION = Vec2{120, 60};	// 俳句表示の基準位置
 constexpr Vec2 NO_KIGO_BUTTON_POS = Vec2{960, 140};
 
 // 色とグラデーション

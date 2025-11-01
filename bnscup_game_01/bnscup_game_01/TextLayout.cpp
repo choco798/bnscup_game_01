@@ -17,62 +17,24 @@ TextLayouter::TextLayouter(const StringView& fontName, double maxWidth,
 Array<LayoutChar> TextLayouter::layout(const String& text) const
 {
 	Array<LayoutChar> out;
-
-	double lineWidth = 0;
-
 	const Font& localFont = FontAsset(m_fontName);
 
-	for (size_t i = 0; i < text.size(); ++i)
-	{
-		lineWidth = Max(
-			lineWidth, localFont.getGlyph(text[i]).xAdvance * m_lineWidthScale);
-	}
+	// 最大行幅を計算
+	const double lineWidth = calculateMaxLineWidth(text, localFont);
 
-	double text_x = 0.0;
-	double text_y = 0.0;
-	int32 index = 0;
-	int32 lineCount = UI::LINE_COUNT_START;
-	int32 headPos = UI::HEAD_POSITION_START;
+	// レイアウト状態を初期化
+	LayoutState state;
+	state.lineCount = UI::LINE_COUNT_START;
+	state.headPos = UI::HEAD_POSITION_START;
 
-	String token;
-
-	// 折り返し候補（スペース）の位置を保持（必要時にのみ使用）
-	Array<size_t> breakablePositions;
-
-	auto flushWord = [&](const String& word)
-	{
-		for (const char32 ch : word)
-		{
-			const auto gi = localFont.getGlyph(ch);
-			RectF box{Arg::topLeft = Vec2{text_x, text_y}, gi.xAdvance,
-					  static_cast<double>(localFont.height())};
-			out << LayoutChar{ch, Vec2{text_x, text_y}, box, index++};
-			text_y += static_cast<double>(localFont.height());
-		}
-	};
-
+	// 各文字を処理
 	for (size_t i = 0; i < text.size(); ++i)
 	{
 		const char32 ch = text[i];
 
-		// 強制改行
-		if (ch == U'*')
+		// 特殊文字処理（改行、位置調整など）
+		if (processSpecialCharacter(ch, localFont, lineWidth, state, out))
 		{
-			flushWord(token);
-			token.clear();
-
-			InsertBreakInText(text_y, text_x, lineWidth,
-							  static_cast<double>(localFont.height()),
-							  lineCount, headPos, breakablePositions);
-			continue;
-		}
-
-		// 強制y位置を3つ戻す
-		if (ch == U'^')
-		{
-			text_y = static_cast<double>(localFont.height()) *
-					 (headPos - UI::BACK_POSITION_OFFSET - 1);
-			headPos -= UI::BACK_POSITION_OFFSET;
 			continue;
 		}
 
@@ -81,61 +43,119 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		// スペースでトークンを区切る
 		if (!isSpace)
 		{
-			token.push_back(ch);
+			state.token.push_back(ch);
 			continue;
 		}
 
-		// 次の単語＋このスペースを載せられるか？（見積り）
-		// const double wordW = m_font(token).region().w;
-		// const double spaceW = m_font(U" ").region().w;
-
-		// 単語出力
-		flushWord(token);
-		token.clear();
-
-		const bool needBreak = true;
-		// 長さで改行をするか決める場合はこちらを利用する
-		// (x + wordW + spaceW) > m_maxLineWidth &&
-		// !breakablePositions.isEmpty();
-		if (needBreak)
-		{
-			// 直前のスペースで改行
-			InsertBreakInText(text_y, text_x, lineWidth,
-							  static_cast<double>(localFont.height()),
-							  lineCount, headPos, breakablePositions);
-		}
-
-		const bool disp_space_box = UI::DISPLAY_SPACE_BOX;
-		// スペースを 1 文字として位置進行（可視描画しないが矩形は持つ）
-		if (disp_space_box)
-		{
-			const auto gi = localFont.getGlyph(U' ');
-			RectF box{Arg::topLeft = Vec2{text_x, text_y}, gi.xAdvance,
-					  static_cast<double>(localFont.height())};
-			out << LayoutChar{U' ', Vec2{text_x, text_y}, box, index++};
-			text_y += static_cast<double>(localFont.height());
-		}
-
-		// 改行候補に登録
-		breakablePositions << out.size();
+		// 単語を処理してスペース処理
+		processWord(state.token, localFont, state, out);
+		state.token.clear();
+		processSpace(localFont, lineWidth, state, out);
 	}
 
-	// 残りの単語を吐き出し
-	if (!token.isEmpty())
+	// 残りの単語を処理
+	if (!state.token.isEmpty())
 	{
-		flushWord(token);
-		token.clear();
+		processWord(state.token, localFont, state, out);
 	}
 
-	// 最終的に各 glyph の advance から box を更新（必要なら）
-	for (auto& lc : out)
-	{
-		const auto gi = localFont.getGlyph(lc.ch);
-		lc.box = RectF{Arg::topLeft = lc.pos, gi.xAdvance,
-					   static_cast<double>(localFont.height())};
-	}
+	// 最終調整
+	finalizeLayout(out, localFont);
 
 	return out;
+}
+
+double TextLayouter::calculateMaxLineWidth(const String& text,
+										   const Font& font) const
+{
+	double lineWidth = 0;
+	for (size_t i = 0; i < text.size(); ++i)
+	{
+		lineWidth =
+			Max(lineWidth, font.getGlyph(text[i]).xAdvance * m_lineWidthScale);
+	}
+	return lineWidth;
+}
+
+bool TextLayouter::processSpecialCharacter(char32 ch, const Font& font,
+										   double lineWidth, LayoutState& state,
+										   Array<LayoutChar>& out) const
+{
+	// 強制改行
+	if (ch == U'*')
+	{
+		processWord(state.token, font, state, out);
+		state.token.clear();
+		InsertBreakInText(state.text_y, state.text_x, lineWidth,
+						  static_cast<double>(font.height()), state.lineCount,
+						  state.headPos, state.breakablePositions);
+		return true;
+	}
+
+	// 強制y位置を戻す
+	if (ch == U'^')
+	{
+		state.text_y = static_cast<double>(font.height()) *
+					   (state.headPos - UI::BACK_POSITION_OFFSET - 1);
+		state.headPos -= UI::BACK_POSITION_OFFSET;
+		return true;
+	}
+
+	return false;
+}
+
+void TextLayouter::processSpace(const Font& font, double lineWidth,
+								LayoutState& state,
+								Array<LayoutChar>& out) const
+{
+	// 改行判定（現在は常に改行）
+	const bool needBreak = true;
+	if (needBreak)
+	{
+		InsertBreakInText(state.text_y, state.text_x, lineWidth,
+						  static_cast<double>(font.height()), state.lineCount,
+						  state.headPos, state.breakablePositions);
+	}
+
+	// スペースボックスの表示（設定による）
+	if (UI::DISPLAY_SPACE_BOX)
+	{
+		const auto gi = font.getGlyph(U' ');
+		RectF box{Arg::topLeft = Vec2{state.text_x, state.text_y}, gi.xAdvance,
+				  static_cast<double>(font.height())};
+		out << LayoutChar{U' ', Vec2{state.text_x, state.text_y}, box,
+						  state.index++};
+		state.text_y += static_cast<double>(font.height());
+	}
+
+	// 改行候補に登録
+	state.breakablePositions << out.size();
+}
+
+void TextLayouter::processWord(const String& word, const Font& font,
+							   LayoutState& state, Array<LayoutChar>& out) const
+{
+	for (const char32 ch : word)
+	{
+		const auto gi = font.getGlyph(ch);
+		RectF box{Arg::topLeft = Vec2{state.text_x, state.text_y}, gi.xAdvance,
+				  static_cast<double>(font.height())};
+		out << LayoutChar{ch, Vec2{state.text_x, state.text_y}, box,
+						  state.index++};
+		state.text_y += static_cast<double>(font.height());
+	}
+}
+
+void TextLayouter::finalizeLayout(Array<LayoutChar>& out,
+								  const Font& font) const
+{
+	// 各glyphのadvanceからboxを更新
+	for (auto& lc : out)
+	{
+		const auto gi = font.getGlyph(lc.ch);
+		lc.box = RectF{Arg::topLeft = lc.pos, gi.xAdvance,
+					   static_cast<double>(font.height())};
+	}
 }
 
 void TextLayouter::InsertBreakInText(

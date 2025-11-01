@@ -177,7 +177,13 @@ void GameScene::startProblem()
 		getData().gameState.problems[getData().gameState.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
-	const Vec2 base = GameConstants::UI::GAME_BASE_POSITION;
+	Vec2 base = GameConstants::UI::GAME_BASE_POSITION;
+	double minLeftX = 0;
+	for (auto& c : m_chars)
+	{
+		minLeftX = Min(minLeftX, c.box.leftX());
+	}
+	base.x -= minLeftX;
 	for (auto& c : m_chars)
 	{
 		c.pos += base;
@@ -443,7 +449,7 @@ void GameScene::handleClick()
 	// 解説表示中にクリックで次の問題へ
 	if (getData().gameState.answered && m_showExplanation)
 	{
-		getData().gameState.state_next();
+		getData().gameState.stateNext();
 		startProblem();
 	}
 	else

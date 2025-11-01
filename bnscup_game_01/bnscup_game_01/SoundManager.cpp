@@ -39,7 +39,8 @@ void SoundManager::playWrong()
 {
 	if (m_seWrong)
 	{
-		m_seWrong.playOneShot(m_seVolume);
+		m_seWrong.setVolume(m_seVolume);
+		m_seWrong.play();
 	}
 }
 

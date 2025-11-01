@@ -24,24 +24,34 @@ TitleScene::TitleScene(const InitData& init) : IScene{init}
 
 void TitleScene::update()
 {
-	// 入力は簡易スライダーのみ処理。遷移は Main 側で制御。
-	// シーン遷移は外側のコントローラで行う想定。
-
-	// ボタン
 	// メインボタンの更新
-	m_startBtn.update();
-	m_howToBtn.update();
-	m_exitBtn.update();
+	updateMainButtons();
 
 	// 段位選択ボタンの更新
 	updateGradeButtons();
 
-	const bool disableInput = getData().showHowToPlay;
-	if (disableInput)
+	// ヘルプ表示中は入力無効
+	if (getData().showHowToPlay)
 	{
 		return;
 	}
 
+	// 音量スライダーの更新
+	updateVolumeSliders();
+
+	// ボタンクリック処理
+	handleButtonClicks();
+}
+
+void TitleScene::updateMainButtons()
+{
+	m_startBtn.update();
+	m_howToBtn.update();
+	m_exitBtn.update();
+}
+
+void TitleScene::updateVolumeSliders()
+{
 	const RectF bgmBar = UI::BGM_VOLUME_BAR;
 	const RectF seBar = UI::SE_VOLUME_BAR;
 	const Circle bgmKnob{bgmBar.x + bgmBar.w * getData().sound.getBgmVolume(),
@@ -50,6 +60,7 @@ void TitleScene::update()
 	const Circle seKnob{seBar.x + seBar.w * getData().sound.getSeVolume(),
 						seBar.y + seBar.h * UI::VOLUME_BAR_CENTER_RATIO,
 						UI::VOLUME_KNOB_RADIUS};
+
 	// ドラッグ開始
 	if (bgmKnob.leftClicked())
 	{
@@ -59,13 +70,15 @@ void TitleScene::update()
 	{
 		m_dragSe = true;
 	}
+
 	// ドラッグ終了
 	if (MouseL.up())
 	{
 		m_dragBgm = false;
 		m_dragSe = false;
 	}
-	// ドラッグ中はつまみ位置から音量を更新
+
+	// ドラッグ中の音量更新
 	if (m_dragBgm)
 	{
 		const double t = Clamp((Cursor::PosF().x - bgmBar.x) / bgmBar.w,
@@ -78,24 +91,15 @@ void TitleScene::update()
 							   Game::MIN_VOLUME, Game::MAX_VOLUME);
 		getData().sound.setSeVolume(t);
 	}
+}
 
+void TitleScene::handleButtonClicks()
+{
 	if (m_startBtn.isClicked())
 	{
-		// 段位が選択されているか確認
-		if (getData().gameState.getSelectedGrade() < 0)
+		if (validateGameStart())
 		{
-			System::MessageBoxOK(U"段位を選択してください。");
-			return;
-		}
-
-		// ゲーム開始
-		getData().gameState.state_reset();
-		if (getData().gameState.problems.isEmpty())
-		{
-			System::MessageBoxOK(U"出題できる問題がありません。");
-		}
-		else
-		{
+			getData().gameState.stateReset();
 			changeScene(State::Game);
 		}
 	}
@@ -109,61 +113,90 @@ void TitleScene::update()
 	}
 }
 
+bool TitleScene::validateGameStart()
+{
+	// 段位が選択されているか確認
+	if (getData().gameState.getSelectedGrade() < 0)
+	{
+		System::MessageBoxOK(U"段位を選択してください。");
+		return false;
+	}
+
+	// 問題が存在するか確認
+	if (!getData().gameState.isValidProblems())
+	{
+		System::MessageBoxOK(U"出題できる問題がありません。");
+		return false;
+	}
+
+	return true;
+}
+
 void TitleScene::draw() const
 {
+	// 背景とタイトル
 	Rect{Scene::Size()}.draw(UI::TITLE_BACKGROUND_COLOR);
-
 	FontAsset(Fonts::KEY_TITLE)(U"季語シンクロ！")
 		.drawAt(Scene::Center().x, UI::TITLE_Y_POS, Palette::Black);
 
-	// 段位選択UIを描画
+	// UI要素の描画
 	drawGradeButtons();
+	drawCurrentRankPanel();
+	drawVolumeControls();
+	drawCopyrightInfo();
 
+	// メインボタンの描画
 	m_startBtn.draw();
 	m_howToBtn.draw();
 	m_exitBtn.draw();
+}
 
-	// 追加: 現在の段位表示（左中パネル）
-	{
-		const RectF panel = UI::CURRENT_RANK_PANEL;
-		panel.rounded(UI::EXPLANATION_PANEL_RADIUS)
-			.draw(UI::EXPLANATION_PANEL_COLOR);
-		panel.drawFrame(UI::HELP_OVERLAY_FRAME_THICKNESS, 0, Palette::Black);
-		FontAsset(Fonts::KEY_TITLE_TEXT)(U"現在の段位")
-			.draw(panel.pos + UI::CURRENT_RANK_TEXT_OFFSET,
-				  Palette::Darkslategray);
-		FontAsset(Fonts::KEY_TITLE_TEXT)(getData().gameState.currentRankName())
-			.draw(panel.pos + UI::CURRENT_RANK_VALUE_OFFSET, Palette::Black);
-	}
+void TitleScene::drawCurrentRankPanel() const
+{
+	const RectF panel = UI::CURRENT_RANK_PANEL;
+	panel.rounded(UI::EXPLANATION_PANEL_RADIUS)
+		.draw(UI::EXPLANATION_PANEL_COLOR);
+	panel.drawFrame(UI::HELP_OVERLAY_FRAME_THICKNESS, 0, Palette::Black);
 
-	// 追加: BGM / SE 音量スライダー（下部）
-	{
-		const RectF bgmBar = UI::BGM_VOLUME_BAR;
-		const RectF seBar = UI::SE_VOLUME_BAR;
-		FontAsset(Fonts::KEY_TITLE_TEXT)(U"BGM 音量")
-			.draw(bgmBar.pos, Palette::Black);
-		FontAsset(Fonts::KEY_TITLE_TEXT)(U"SE 音量")
-			.draw(seBar.pos, Palette::Black);
-		// バー
-		bgmBar.draw(m_dragBgm ? UI::VOLUME_BAR_DRAG_COLOR
-							  : UI::VOLUME_BAR_NORMAL_COLOR);
-		seBar.draw(m_dragSe ? UI::VOLUME_BAR_DRAG_COLOR
-							: UI::VOLUME_BAR_NORMAL_COLOR);
-		// ノブ
-		const Circle bgmKnob{
-			bgmBar.x + bgmBar.w * getData().sound.getBgmVolume(),
-			bgmBar.y + bgmBar.h * UI::VOLUME_BAR_CENTER_RATIO,
-			UI::VOLUME_KNOB_RADIUS};
-		const Circle seKnob{seBar.x + seBar.w * getData().sound.getSeVolume(),
-							seBar.y + seBar.h * UI::VOLUME_BAR_CENTER_RATIO,
-							UI::VOLUME_KNOB_RADIUS};
-		bgmKnob.draw(Palette::White)
-			.drawFrame(UI::VOLUME_KNOB_FRAME_THICKNESS, 0, Palette::Black);
-		seKnob.draw(Palette::White)
-			.drawFrame(UI::VOLUME_KNOB_FRAME_THICKNESS, 0, Palette::Black);
-	}
+	FontAsset(Fonts::KEY_TITLE_TEXT)(U"現在の段位")
+		.draw(panel.pos + UI::CURRENT_RANK_TEXT_OFFSET, Palette::Darkslategray);
+	FontAsset(Fonts::KEY_TITLE_TEXT)(getData().gameState.currentRankName())
+		.draw(panel.pos + UI::CURRENT_RANK_VALUE_OFFSET, Palette::Black);
+}
 
-	// 著作権表示
+void TitleScene::drawVolumeControls() const
+{
+	const RectF bgmBar = UI::BGM_VOLUME_BAR;
+	const RectF seBar = UI::SE_VOLUME_BAR;
+
+	// ラベル
+	FontAsset(Fonts::KEY_TITLE_TEXT)(U"BGM 音量")
+		.draw(bgmBar.pos, Palette::Black);
+	FontAsset(Fonts::KEY_TITLE_TEXT)(U"SE 音量")
+		.draw(seBar.pos, Palette::Black);
+
+	// バー
+	bgmBar.draw(m_dragBgm ? UI::VOLUME_BAR_DRAG_COLOR
+						  : UI::VOLUME_BAR_NORMAL_COLOR);
+	seBar.draw(m_dragSe ? UI::VOLUME_BAR_DRAG_COLOR
+						: UI::VOLUME_BAR_NORMAL_COLOR);
+
+	// ノブ
+	const Circle bgmKnob{bgmBar.x + bgmBar.w * getData().sound.getBgmVolume(),
+						 bgmBar.y + bgmBar.h * UI::VOLUME_BAR_CENTER_RATIO,
+						 UI::VOLUME_KNOB_RADIUS};
+	const Circle seKnob{seBar.x + seBar.w * getData().sound.getSeVolume(),
+						seBar.y + seBar.h * UI::VOLUME_BAR_CENTER_RATIO,
+						UI::VOLUME_KNOB_RADIUS};
+
+	bgmKnob.draw(Palette::White)
+		.drawFrame(UI::VOLUME_KNOB_FRAME_THICKNESS, 0, Palette::Black);
+	seKnob.draw(Palette::White)
+		.drawFrame(UI::VOLUME_KNOB_FRAME_THICKNESS, 0, Palette::Black);
+}
+
+void TitleScene::drawCopyrightInfo() const
+{
 	FontAsset(Fonts::KEY_COPYRIGHT)(
 		U"Version 0.5  2025/10/25\nCopyright\nプログラム・サウンド: Nasatame "
 		U"\nプログラム・イラスト: moqueca "

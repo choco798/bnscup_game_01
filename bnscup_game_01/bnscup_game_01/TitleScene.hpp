@@ -27,4 +27,15 @@ class TitleScene : public KigoGameApp::Scene
 	void initializeGradeButtons();
 	void updateGradeButtons();
 	void drawGradeButtons() const;
+
+	// update()の分割メソッド
+	void updateMainButtons();
+	void updateVolumeSliders();
+	void handleButtonClicks();
+	bool validateGameStart();
+
+	// draw()の分割メソッド
+	void drawCurrentRankPanel() const;
+	void drawVolumeControls() const;
+	void drawCopyrightInfo() const;
 };

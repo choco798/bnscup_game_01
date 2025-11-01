@@ -30,8 +30,8 @@ class GameState
 	bool initialize();
 
 	void loadFromSaveData();
-	void state_reset();
-	void state_next();
+	void stateReset();
+	void stateNext();
 	bool updateRank();	// 段位の更新を試みる
 	void updateProgress(const Problem& problem, bool correct);	// 進捗更新
 
@@ -50,6 +50,7 @@ class GameState
 		return selectedGrade;
 	}
 	bool isGradeAvailable(int32 grade) const;
+	bool isValidProblems();
 
 	// 昇段条件を満たしているか確認
 	bool canPromote() const;

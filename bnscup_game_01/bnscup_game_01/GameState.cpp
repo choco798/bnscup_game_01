@@ -25,7 +25,7 @@ void GameState::loadFromSaveData()
 	saveData.problemStatus.resize(m_problemManager.getProblems().size(), false);
 }
 
-void GameState::state_reset()
+void GameState::stateReset()
 {
 	currentIndex = 0;
 	score = GameConstants::INITIAL_SCORE;
@@ -49,7 +49,7 @@ void GameState::state_reset()
 	}
 }
 
-void GameState::state_next()
+void GameState::stateNext()
 {
 	if (currentIndex + 1 < problems.size())
 	{
@@ -154,6 +154,11 @@ bool GameState::isGradeAvailable(int32 grade) const
 
 	// プレイヤーの現在の段位より下の段位は常にプレイ可能
 	return grade <= static_cast<int32>(saveData.rankIndex);
+}
+
+bool GameState::isValidProblems()
+{
+	return m_problemManager.getProblemsForGrade(selectedGrade).size() > 0;
 }
 
 void GameState::setSelectedGrade(int32 grade)
