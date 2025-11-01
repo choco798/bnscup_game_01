@@ -19,10 +19,13 @@ void ResultScene::update()
 		// ゲーム終了時に自動セーブを実行
 		auto& saveDataManager = getData().saveDataManager;
 
-		// スコアを加算
-		saveDataManager.addScore(getData().gameState.score);
-
-		// 昇段作業
+		// 昇段判定と処理
+		auto& gameState = getData().gameState;
+		gameState.updateProgress();
+		if (gameState.canPromote())
+		{
+			gameState.updateRank();
+		}
 
 		// セーブを実行（1回のみ）
 		if (!saveDataManager.save())

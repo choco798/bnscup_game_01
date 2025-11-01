@@ -101,8 +101,8 @@ constexpr ColorF VOLUME_BAR_DRAG_COLOR = ColorF{0.4};
 constexpr RectF GRADE_SELECTION_PANEL = RectF{900, 300, 300, 280};
 constexpr Vec2 GRADE_SELECTION_TITLE_OFFSET =
 	Vec2{150, 20};	// panel center + offset
-constexpr Vec2 GRADE_BUTTON_BASE_POS = Vec2{1050, 400};
-constexpr double GRADE_BUTTON_Y_STEP = 40.0;
+constexpr Vec2 GRADE_BUTTON_BASE_POS = Vec2{1050, 380};
+constexpr double GRADE_BUTTON_Y_STEP = 70.0;
 constexpr ColorF GRADE_SELECTION_HIGHLIGHT = ColorF{0.3, 0.6, 1.0, 0.6};
 constexpr int GRADE_SELECTION_HIGHLIGHT_STRETCH = 4;
 

@@ -265,7 +265,7 @@ void TitleScene::drawGradeButtons() const
 		panel.rounded(UI::EXPLANATION_PANEL_RADIUS)
 			.draw(UI::EXPLANATION_PANEL_COLOR);
 		panel.drawFrame(UI::HELP_OVERLAY_FRAME_THICKNESS, 0, Palette::Black);
-		FontAsset(Fonts::KEY_TITLE_TEXT)(U"段位選択")
+		FontAsset(Fonts::KEY_TITLE_TEXT)(U"問題選択")
 			.drawAt(panel.pos + UI::GRADE_SELECTION_TITLE_OFFSET,
 					Palette::Darkslategray);
 	}

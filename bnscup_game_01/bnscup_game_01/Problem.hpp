@@ -11,6 +11,7 @@ struct ProblemGrade
 
 struct Problem
 {
+	int32 index;		 // 問題番号（配列インデックス）
 	String id;			 // 問題ID
 	String author;		 // 作者名
 	String source;		 // 出典
@@ -24,10 +25,10 @@ struct Problem
 
 	// 段位システム用フィールド
 	int32 grade = ProblemGrade::Trainee;  // 難易度（0=特待生, 1=名人, 2=達人）
-	bool completed = false;		   // 正解済みフラグ
-	String ruby;				   // フリガナ情報
-	String rhythm;				   // リズム情報
-	bool displayRuby = false;	   // フリガナ表示フラグ
+	bool completed = false;				  // 正解済みフラグ
+	String ruby;						  // フリガナ情報
+	String rhythm;						  // リズム情報
+	bool displayRuby = false;			  // フリガナ表示フラグ
 
 	bool isValid() const;  // データの整合性チェック
 

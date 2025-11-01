@@ -230,7 +230,9 @@ void GameScene::draw() const
 	}
 
 	// チュートリアルに関しては特別扱い
-	const bool isTutorial = (getData().gameState.currentIndex == 0);
+	const bool isTutorial =
+		(getData().gameState.currentIndex == 0) &&
+		(getData().gameState.currentRankName() == GameConstants::RankNames::getRankName(0));
 
 	if (m_showExplanation || isTutorial)
 	{

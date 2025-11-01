@@ -3,7 +3,6 @@
 #include "GameConstants.hpp"
 #include "SaveDataManager.hpp"
 
-
 GameState::GameState(SaveDataManager& saveManager, ConfigManager& configManager,
 					 ProblemManager& problemManager)
 	: m_saveManager(saveManager),
@@ -79,30 +78,23 @@ size_t GameState::getProgressForGrade(int32 grade) const
 	return m_saveManager.getData().gradeProgress[grade];
 }
 
-void GameState::updateProgress(const Problem& problem, bool correct)
+void GameState::updateProgress()
 {
-	if (correct)
+	// すべての問題に正解した場合にのみ進捗を更新される
+	if (currentIndex < problems.size())
 	{
-		// 正解した問題の段位の進捗を更新
-		auto& saveData = m_saveManager.getData();
-		saveData.gradeProgress[problem.grade]++;
-		saveData.totalScore += score;
+		return;
+	}
 
+	// まずはスコア加算
+	m_saveManager.addScore(score);
+
+	// 進捗更新
+	for (size_t i = 0; i < problems.size(); ++i)
+	{
+		m_saveManager.getData().gradeProgress[problems[i].grade]++;
 		// 問題のクリア状態を更新
-		if (currentIndex < saveData.problemStatus.size())
-		{
-			saveData.problemStatus[currentIndex] = true;
-		}
-
-		// セーブデータを保存
-		m_saveManager.save();
-
-		// 昇段判定
-		if (updateRank())
-		{
-			saveData.rankIndex++;
-			m_saveManager.save();
-		}
+		m_saveManager.getData().problemStatus.at(problems[i].index) = true;
 	}
 }
 
@@ -113,8 +105,8 @@ bool GameState::updateRank()
 	{
 		return false;  // すでに最高段位
 	}
-
-	return canPromote();
+	saveData.rankIndex++;
+	return true;
 }
 
 bool GameState::canPromote() const

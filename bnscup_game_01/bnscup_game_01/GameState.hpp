@@ -3,7 +3,6 @@
 #include "ProblemManager.hpp"
 #include "SaveDataManager.hpp"
 
-
 class ConfigManager;
 
 class GameState
@@ -32,8 +31,10 @@ class GameState
 	void loadFromSaveData();
 	void stateReset();
 	void stateNext();
-	bool updateRank();	// 段位の更新を試みる
-	void updateProgress(const Problem& problem, bool correct);	// 進捗更新
+
+	// 進捗・段位関連
+	bool updateRank();		// 段位の更新を試みる
+	void updateProgress();	// 進捗更新まわりをすべて対応する
 
 	// 表示用の現在段位名を返す
 	String currentRankName() const;

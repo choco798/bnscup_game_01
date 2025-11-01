@@ -47,7 +47,7 @@ bool ProblemManager::loadFromJSON(const StringView& path)
 			Console << U"[ProblemManager] invalid problem: {}"_fmt(p.id);
 			continue;  // 不正なものはスキップ
 		}
-
+		p.index = static_cast<int32>(m_problems.size());
 		m_problems << p;  // 全問題配列に追加
 	}
 
