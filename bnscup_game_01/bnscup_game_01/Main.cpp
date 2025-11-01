@@ -62,14 +62,6 @@ void Main()
 		U"　閉じる　", U"HowToPlay",
 		Vec2{panel.x + panel.w - 120, panel.y + panel.h - 44}};
 
-	// 問題ロード
-	ProblemManager problemManager;
-	if (!problemManager.loadFromJSON(U"problems.json"))
-	{
-		System::MessageBoxOK(
-			U"問題ファイルの読み込みに失敗しました。\nAssets/problems.json "
-			U"を確認してください。");
-	}
 
 	// シーン管理
 	KigoGameApp manager;
@@ -80,8 +72,14 @@ void Main()
 		manager.get()->sound.loadAssets();
 		manager.get()->saveDataManager.initialize(U"savedata.json");
 		manager.get()->configManager.initialize(U"config.json");
+		// 問題ロード
+		if (!manager.get()->problemManager.loadFromJSON(U"problems.json"))
+		{
+			System::MessageBoxOK(
+				U"問題ファイルの読み込みに失敗しました。\nAssets/problems.json "
+				U"を確認してください。");
+		}
 		manager.get()->gameState.initialize();
-		manager.get()->gameState.problems = problemManager.getProblems();
 		manager.get()->renderer.initRenderer(U"Game");
 
 		Window::Resize(manager.get()->configManager.ui().clientSizeX,

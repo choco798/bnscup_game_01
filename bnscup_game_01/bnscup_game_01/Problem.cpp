@@ -27,7 +27,7 @@ bool Problem::isKigoValid() const
 
 bool Problem::isGradeValid() const
 {
-	return grade >= 0 && grade < Grade::Count;
+	return grade >= 0 && grade < ProblemGrade::Count;
 }
 
 bool Problem::isRubyValid() const

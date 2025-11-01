@@ -18,6 +18,8 @@ void ResultScene::update()
 		// スコアを加算
 		saveDataManager.addScore(getData().gameState.score);
 
+		// 昇段作業
+
 		// セーブを実行（1回のみ）
 		if (!saveDataManager.save())
 		{

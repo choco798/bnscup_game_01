@@ -431,9 +431,15 @@ void GameScene::ExecWrong()
 void GameScene::ExecCorrect()
 {
 	getData().sound.playCorrect();
-	getData().gameState.score +=
-		10 *
-		(getData().gameState.problems[getData().gameState.currentIndex].grade + 1);
-	getData().gameState.correctCount += 1;
-	m_showExplanation = true;
+	// 連打したときに音は鳴らすけど、正解数カウントは上げないようにする
+	if (m_showExplanation)
+	{
+		getData().gameState.score +=
+			10 * (getData()
+					  .gameState.problems[getData().gameState.currentIndex]
+					  .grade +
+				  1);
+		getData().gameState.correctCount += 1;
+		m_showExplanation = true;
+	}
 }

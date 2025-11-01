@@ -21,7 +21,7 @@ struct AudioConfig
 struct SaveData
 {
 	size_t rankIndex = 0;				   // 現在の段位
-	Array<size_t> gradeProgress{0, 0, 0};  // 各段位での進捗
+	Array<size_t> gradeProgress{0, 0, 0};  // 各段位問題での進捗
 	Array<bool> problemStatus;			   // 問題ごとのクリア状況
 	int32 totalScore = 0;				   // 累計スコア
 

@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include "SceneBase.hpp"
-#include "SoundManager.hpp"
-#include "Config.hpp"
 #include "UiButton.hpp"
 
 class TitleScene : public KigoGameApp::Scene
@@ -13,12 +11,20 @@ class TitleScene : public KigoGameApp::Scene
 	void draw() const override;
 
    private:
-
 	// 簡易スライダー UI 状態
 	bool m_dragBgm = false;
 	bool m_dragSe = false;
 
+	// ボタン
 	ui::Button m_startBtn{};
 	ui::Button m_howToBtn{};
 	ui::Button m_exitBtn{};
+
+	// 段位選択ボタン
+	Array<ui::Button> m_gradeButtons{};
+
+	// メソッド
+	void initializeGradeButtons();
+	void updateGradeButtons();
+	void drawGradeButtons() const;
 };

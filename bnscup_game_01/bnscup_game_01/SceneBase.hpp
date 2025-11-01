@@ -27,10 +27,11 @@ enum class State
 struct GameData
 {
 	SoundManager sound{};
-	ConfigManager configManager{};
 	SaveDataManager saveDataManager{};
+	ConfigManager configManager{};
+	ProblemManager problemManager{};
 	bool showHowToPlay{};
-	GameState gameState{saveDataManager, configManager};
+	GameState gameState{saveDataManager, configManager, problemManager};
 	Renderer renderer{};
 };
 

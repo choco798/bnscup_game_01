@@ -4,7 +4,23 @@
     0,
     0
   ],
-  "problemStatus": [],
+  "problemStatus": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
   "rankIndex": 0,
-  "totalScore": 150
+  "totalScore": 240
 }

@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-// 段位の定数定義
-struct Grade
+// 認定問題の段位定義
+struct ProblemGrade
 {
 	static constexpr int32 Trainee = 0;	 // 特待生
 	static constexpr int32 Master = 1;	 // 名人
 	static constexpr int32 Expert = 2;	 // 達人
-	static constexpr int32 Count = 3;	 // 段位の数
+	static constexpr int32 Count = 3;	 // 段位認定問題の数
 };
 
 struct Problem
@@ -23,7 +23,7 @@ struct Problem
 	Array<String> tags;	 // メタ情報タグ
 
 	// 段位システム用フィールド
-	int32 grade = Grade::Trainee;  // 難易度（0=特待生, 1=名人, 2=達人）
+	int32 grade = ProblemGrade::Trainee;  // 難易度（0=特待生, 1=名人, 2=達人）
 	bool completed = false;		   // 正解済みフラグ
 	String ruby;				   // フリガナ情報
 	String rhythm;				   // リズム情報
