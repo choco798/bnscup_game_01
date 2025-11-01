@@ -41,20 +41,6 @@ bool MoraRenderer::initialize()
 		return true;
 	}
 
-	// GameConstantsの定数を使ってフォント登録
-	using namespace GameConstants::Rhythm;
-
-	FontAsset::Register(KEY_KANA_BIG, FontMethod::MSDF, SIZE_KANA_BIG,
-						Typeface::Regular);
-	FontAsset::Register(KEY_KANA_SMALL, FontMethod::MSDF, SIZE_KANA_SMALL,
-						Typeface::Regular);
-	FontAsset::Register(KEY_UI_SMALL, FontMethod::MSDF, SIZE_UI_SMALL,
-						Typeface::Regular);
-
-	// フォント読み込み待機
-	FontAsset::Wait(KEY_KANA_BIG);
-	FontAsset::Wait(KEY_KANA_SMALL);
-	FontAsset::Wait(KEY_UI_SMALL);
 
 	m_initialized = true;
 	return true;
@@ -63,10 +49,6 @@ bool MoraRenderer::initialize()
 void MoraRenderer::finalize()
 {
 	using namespace GameConstants::Rhythm;
-
-	FontAsset::Unregister(KEY_KANA_BIG);
-	FontAsset::Unregister(KEY_KANA_SMALL);
-	FontAsset::Unregister(KEY_UI_SMALL);
 
 	m_initialized = false;
 }

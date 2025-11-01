@@ -61,3 +61,46 @@ void SaveData::deserialize(const JSON& json)
 		}
 	}
 }
+
+void RhythmConfig::serialize(JSON& json) const
+{
+	json[U"bpm"] = bpm;
+	json[U"micSensitivity"] = micSensitivity;
+	json[U"rhythmModeEnabled"] = rhythmModeEnabled;
+
+	// VADパラメータ
+	json[U"vadAlpha"] = vadAlpha;
+	json[U"vadKOn"] = vadKOn;
+	json[U"vadKOff"] = vadKOff;
+	json[U"vadAbsOn"] = vadAbsOn;
+	json[U"vadAbsOff"] = vadAbsOff;
+	json[U"vadBandLowHz"] = vadBandLowHz;
+	json[U"vadBandHighHz"] = vadBandHighHz;
+	json[U"vadMinOnMs"] = static_cast<int64>(vadMinOnMs);
+	json[U"vadMinOffMs"] = static_cast<int64>(vadMinOffMs);
+}
+
+void RhythmConfig::deserialize(const JSON& json)
+{
+	bpm = json[U"bpm"].getOr<double>(120.0);
+	micSensitivity = json[U"micSensitivity"].getOr<double>(0.5);
+	rhythmModeEnabled = json[U"rhythmModeEnabled"].getOr<bool>(true);
+
+	// VADパラメータ（デフォルト値はGameConstants::Rhythmから）
+	vadAlpha =
+		json[U"vadAlpha"].getOr<double>(GameConstants::Rhythm::VAD_ALPHA);
+	vadKOn = json[U"vadKOn"].getOr<double>(GameConstants::Rhythm::VAD_K_ON);
+	vadKOff = json[U"vadKOff"].getOr<double>(GameConstants::Rhythm::VAD_K_OFF);
+	vadAbsOn =
+		json[U"vadAbsOn"].getOr<double>(GameConstants::Rhythm::VAD_ABS_ON);
+	vadAbsOff =
+		json[U"vadAbsOff"].getOr<double>(GameConstants::Rhythm::VAD_ABS_OFF);
+	vadBandLowHz = json[U"vadBandLowHz"].getOr<double>(
+		GameConstants::Rhythm::VAD_BAND_LOW_HZ);
+	vadBandHighHz = json[U"vadBandHighHz"].getOr<double>(
+		GameConstants::Rhythm::VAD_BAND_HIGH_HZ);
+	vadMinOnMs = static_cast<int32>(
+		json[U"vadMinOnMs"].getOr<int64>(GameConstants::Rhythm::VAD_MIN_ON_MS));
+	vadMinOffMs = static_cast<int32>(json[U"vadMinOffMs"].getOr<int64>(
+		GameConstants::Rhythm::VAD_MIN_OFF_MS));
+}

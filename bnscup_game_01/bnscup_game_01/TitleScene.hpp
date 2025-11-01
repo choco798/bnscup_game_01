@@ -18,6 +18,7 @@ class TitleScene : public KigoGameApp::Scene
 	// ボタン
 	ui::Button m_startBtn{};
 	ui::Button m_howToBtn{};
+	ui::Button m_rhythmOptionBtn{};
 	ui::Button m_exitBtn{};
 
 	// 段位選択ボタン

@@ -21,6 +21,7 @@ enum class State
 	Title,
 	Game,
 	Result,
+	RhythmOption,  // リズムオプション追加
 };
 
 // 共有するデータ

@@ -49,6 +49,12 @@ bool ConfigManager::initialize(const StringView& path)
 				audio[U"seVolume"].getOr<double>(m_audio.seVolume);
 		}
 
+		// リズム設定の読み込み
+		if (const auto rhythm = json[U"rhythm"])
+		{
+			m_rhythm.deserialize(rhythm);
+		}
+
 		return true;
 	}
 	catch (const Error& e)
@@ -85,6 +91,13 @@ bool ConfigManager::save() const
 			audio[U"bgmVolume"] = m_audio.bgmVolume;
 			audio[U"seVolume"] = m_audio.seVolume;
 			json[U"audio"] = audio;
+		}
+
+		// リズム設定の保存
+		{
+			JSON rhythm;
+			m_rhythm.serialize(rhythm);
+			json[U"rhythm"] = rhythm;
 		}
 
 		return json.save(m_configPath);

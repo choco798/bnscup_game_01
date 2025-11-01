@@ -6,6 +6,7 @@ class ConfigManager
    private:
 	UIConfig m_ui;
 	AudioConfig m_audio;
+	RhythmConfig m_rhythm;
 	FilePath m_configPath;
 
    public:
@@ -33,6 +34,16 @@ class ConfigManager
 	AudioConfig& audio() noexcept
 	{
 		return m_audio;
+	}
+
+	// RhythmConfig へのアクセス
+	const RhythmConfig& rhythm() const noexcept
+	{
+		return m_rhythm;
+	}
+	RhythmConfig& rhythm() noexcept
+	{
+		return m_rhythm;
 	}
 
 	// 設定の保存

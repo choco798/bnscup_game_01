@@ -159,13 +159,13 @@ void VoiceActivityDetector::drawUI() const
 	const double e = energy();
 	const double n = noiseEMA();
 
-	RectF{40, 380, 600, 24}.draw(Palette::White);
-	RectF{40, 380, 600 * Saturate(e / (n * 5.0 + 0.1)), 24}.draw(
+	RectF{40, 580, 600, 24}.draw(Palette::White);
+	RectF{40, 580, 600 * Saturate(e / (n * 5.0 + 0.1)), 24}.draw(
 		isVoice() ? ColorF{0.9, 0.6, 0.2} : ColorF(Palette::Gray));
 
 	FontAsset(KEY_UI_SMALL)(U"energy:{:.4f}  noise:{:.4f}  state:{}"_fmt(
 								e, n, (isVoice() ? U"VOICE" : U"SILENCE")))
-		.draw(40, 340, Palette::Black);
+		.draw(40, 540, Palette::Black);
 
 	// しきい値目安線
 	const double thOn = onThreshold();
@@ -173,8 +173,8 @@ void VoiceActivityDetector::drawUI() const
 	const double base = (n * 5.0 + 0.1);
 	const double xOn = 40 + 600 * Saturate(thOn / base);
 	const double xOff = 40 + 600 * Saturate(thOff / base);
-	Line{xOn, 380, xOn, 404}.draw(2, Palette::Orange);
-	Line{xOff, 380, xOff, 404}.draw(2, Palette::Skyblue);
+	Line{xOn, 580, xOn, 604}.draw(2, Palette::Orange);
+	Line{xOff, 580, xOff, 604}.draw(2, Palette::Skyblue);
 }
 
 bool VoiceActivityDetector::isVoice() const

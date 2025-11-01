@@ -5,6 +5,9 @@ using namespace GameConstants;
 
 TitleScene::TitleScene(const InitData& init) : IScene{init}
 {
+	// 設定を保存（他のシーンから戻ってきた際の変更を反映）
+	getData().configManager.save();
+
 	getData().sound.playBGM();
 
 	getData().sound.setBgmVolume(getData().configManager.audio().bgmVolume);
@@ -18,6 +21,9 @@ TitleScene::TitleScene(const InitData& init) : IScene{init}
 							Vec2{Scene::Center().x, UI::START_BUTTON_Y_POS});
 	m_howToBtn = ui::Button(U"遊び方", Fonts::KEY_TITLE_TEXT,
 							Vec2{Scene::Center().x, UI::HOWTO_BUTTON_Y_POS});
+	m_rhythmOptionBtn =
+		ui::Button(U"マイク設定", Fonts::KEY_TITLE_TEXT,
+				   Vec2{Scene::Center().x, UI::RHYTHM_OPTION_Y_POS});
 	m_exitBtn = ui::Button(U"終了", Fonts::KEY_TITLE_TEXT,
 						   Vec2{Scene::Center().x, UI::EXIT_BUTTON_Y_POS});
 }
@@ -47,6 +53,7 @@ void TitleScene::updateMainButtons()
 {
 	m_startBtn.update();
 	m_howToBtn.update();
+	m_rhythmOptionBtn.update();
 	m_exitBtn.update();
 }
 
@@ -84,12 +91,14 @@ void TitleScene::updateVolumeSliders()
 		const double t = Clamp((Cursor::PosF().x - bgmBar.x) / bgmBar.w,
 							   Game::MIN_VOLUME, Game::MAX_VOLUME);
 		getData().sound.setBgmVolume(t);
+		getData().configManager.audio().bgmVolume = t;
 	}
 	if (m_dragSe)
 	{
 		const double t = Clamp((Cursor::PosF().x - seBar.x) / seBar.w,
 							   Game::MIN_VOLUME, Game::MAX_VOLUME);
 		getData().sound.setSeVolume(t);
+		getData().configManager.audio().seVolume = t;
 	}
 }
 
@@ -106,6 +115,10 @@ void TitleScene::handleButtonClicks()
 	if (m_howToBtn.isClicked())
 	{
 		getData().showHowToPlay = true;
+	}
+	if (m_rhythmOptionBtn.isClicked())
+	{
+		changeScene(State::RhythmOption);
 	}
 	if (m_exitBtn.isClicked())
 	{
@@ -148,6 +161,7 @@ void TitleScene::draw() const
 	// メインボタンの描画
 	m_startBtn.draw();
 	m_howToBtn.draw();
+	m_rhythmOptionBtn.draw();
 	m_exitBtn.draw();
 }
 

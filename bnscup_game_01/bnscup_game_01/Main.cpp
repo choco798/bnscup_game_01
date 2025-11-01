@@ -10,6 +10,7 @@
 #include "ProblemManager.hpp"
 #include "Renderer.hpp"
 #include "ResultScene.hpp"
+#include "RhythmOptionScene.hpp"
 #include "SceneBase.hpp"
 #include "SoundManager.hpp"
 #include "TitleScene.hpp"
@@ -28,6 +29,8 @@ namespace
 void InitializeGameAsset()
 {
 	using namespace GameConstants::Fonts;
+	using namespace GameConstants::Rhythm;
+	// GameConstantsの定数を使ってフォント登録
 
 	// フォントアセットを登録する（定数使用）
 	FontAsset::Register(KEY_TITLE, FontMethod::MSDF, SIZE_TITLE,
@@ -47,15 +50,24 @@ void InitializeGameAsset()
 						Typeface::Bold);
 	FontAsset::Register(KEY_SCORE, FontMethod::MSDF, SIZE_SCORE);
 	FontAsset::Register(KEY_COPYRIGHT, FontMethod::MSDF, SIZE_COPYRIGHT);
+
+	FontAsset::Register(KEY_KANA_BIG, FontMethod::MSDF, SIZE_KANA_BIG,
+						Typeface::Regular);
+	FontAsset::Register(KEY_KANA_SMALL, FontMethod::MSDF, SIZE_KANA_SMALL,
+						Typeface::Regular);
+	FontAsset::Register(KEY_UI_SMALL, FontMethod::MSDF, SIZE_UI_SMALL,
+						Typeface::Regular);
 }
 
 void WaitGameAssetLoad()
 {
 	using namespace GameConstants::Fonts;
+	using namespace GameConstants::Rhythm;
 	// 非同期読み込み待機
 	const Array<StringView> fontKeys = {
-		KEY_TITLE, KEY_TITLE_TEXT,	KEY_GAME,	KEY_RUBY,  KEY_EXPLANATION,
-		KEY_MENU,  KEY_HOW_TO_PLAY, KEY_RESULT, KEY_SCORE, KEY_COPYRIGHT};
+		KEY_TITLE,	  KEY_TITLE_TEXT,  KEY_GAME,	KEY_RUBY,  KEY_EXPLANATION,
+		KEY_MENU,	  KEY_HOW_TO_PLAY, KEY_RESULT,	KEY_SCORE, KEY_COPYRIGHT,
+		KEY_KANA_BIG, KEY_KANA_SMALL,  KEY_UI_SMALL};
 
 	for (const auto& key : fontKeys)
 	{
@@ -110,6 +122,7 @@ void Main()
 	manager.add<TitleScene>(State::Title);
 	manager.add<GameScene>(State::Game);
 	manager.add<ResultScene>(State::Result);
+	manager.add<RhythmOptionScene>(State::RhythmOption);
 
 	manager.init(State::Title);
 

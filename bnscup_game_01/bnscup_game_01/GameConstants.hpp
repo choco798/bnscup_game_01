@@ -80,8 +80,9 @@ constexpr int HELP_TEXT_LINE_HEIGHT = 40;
 constexpr ColorF TITLE_BACKGROUND_COLOR = ColorF{0.96};
 constexpr double TITLE_Y_POS = 160.0;
 constexpr double START_BUTTON_Y_POS = 430.0;
-constexpr double HOWTO_BUTTON_Y_POS = 560.0;
-constexpr double EXIT_BUTTON_Y_POS = 640.0;
+constexpr double HOWTO_BUTTON_Y_POS = 520.0;
+constexpr double RHYTHM_OPTION_Y_POS = 590.0;
+constexpr double EXIT_BUTTON_Y_POS = 660.0;
 
 // 現在段位表示パネル
 constexpr RectF CURRENT_RANK_PANEL = RectF{50, 250, 300, 100};
