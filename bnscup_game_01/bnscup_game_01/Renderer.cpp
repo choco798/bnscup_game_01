@@ -1,6 +1,9 @@
 ﻿#include "Renderer.hpp"
+#include "GameConstants.hpp"
 
-void Renderer::initRenderer(const String fontName)
+using namespace GameConstants;
+
+void Renderer::initRenderer(const StringView& fontName)
 {
 	m_fontName = fontName;
 	m_bg = {Texture{U"Assets/images/bg_paper.png"}};
@@ -19,7 +22,7 @@ void Renderer::drawBackground() const
 	}
 	else
 	{
-		Rect{Scene::Size()}.draw(ColorF{0.97, 0.97, 0.94});
+		Rect{Scene::Size()}.draw(UI::FALLBACK_BACKGROUND_COLOR);
 	}
 }
 
@@ -35,7 +38,7 @@ void Renderer::drawTeacherNormal() const
 {
 	if (m_teacherNormal)
 	{
-		m_teacherNormal.draw(1000, 420);
+		m_teacherNormal.draw(UI::TEACHER_POSITION);
 	}
 }
 
@@ -43,7 +46,7 @@ void Renderer::drawTeacherHappy() const
 {
 	if (m_teacherHappy)
 	{
-		m_teacherHappy.draw(1000, 420);
+		m_teacherHappy.draw(UI::TEACHER_POSITION);
 	}
 }
 
@@ -51,7 +54,7 @@ void Renderer::drawTeacherAngry() const
 {
 	if (m_teacherAngry)
 	{
-		m_teacherAngry.draw(1000, 420);
+		m_teacherAngry.draw(UI::TEACHER_POSITION);
 	}
 }
 
@@ -63,39 +66,45 @@ void Renderer::drawExplanation(const String& kigo, const String& season,
 
 	String kigo_show_text = U"季語 : " + kigo;
 
-	const RectF panelSeason{60, 470, 120, 50};
-	panelSeason.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
-	panelSeason.drawFrame(2, 0, Palette::Gray);
+	const RectF panelSeason = UI::EXPLANATION_SEASON_PANEL;
+	panelSeason.rounded(UI::EXPLANATION_PANEL_RADIUS)
+		.draw(UI::EXPLANATION_PANEL_COLOR);
+	panelSeason.drawFrame(UI::EXPLANATION_FRAME_THICKNESS, 0, Palette::Gray);
 
 	const RectF panelKigo{
-		200, 470, 60 + FontAsset(U"Explanation")(kigo_show_text).region().w,
-		50};
-	panelKigo.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
-	panelKigo.drawFrame(2, 0, Palette::Gray);
+		UI::EXPLANATION_KIGO_BASE_POS.x, UI::EXPLANATION_KIGO_BASE_POS.y,
+		UI::EXPLANATION_KIGO_BASE_SIZE.x +
+			FontAsset(Fonts::KEY_EXPLANATION)(kigo_show_text).region().w,
+		UI::EXPLANATION_KIGO_BASE_SIZE.y};
+	panelKigo.rounded(UI::EXPLANATION_PANEL_RADIUS)
+		.draw(UI::EXPLANATION_PANEL_COLOR);
+	panelKigo.drawFrame(UI::EXPLANATION_FRAME_THICKNESS, 0, Palette::Gray);
 
-	const RectF panelMain{60, 540, 1100, 140};
-	panelMain.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
-	panelMain.drawFrame(2, 0, Palette::Gray);
+	const RectF panelMain = UI::EXPLANATION_MAIN_PANEL;
+	panelMain.rounded(UI::EXPLANATION_PANEL_RADIUS)
+		.draw(UI::EXPLANATION_PANEL_COLOR);
+	panelMain.drawFrame(UI::EXPLANATION_FRAME_THICKNESS, 0, Palette::Gray);
 
-	FontAsset(U"Explanation")(season).draw(panelSeason.pos.movedBy(30, 0),
-										   Palette::Black);
-	FontAsset(U"Explanation")(kigo_show_text)
-		.draw(panelKigo.pos.movedBy(30, 0),
-										 Palette::Black);
+	FontAsset(Fonts::KEY_EXPLANATION)(season).draw(
+		panelSeason.pos.movedBy(UI::EXPLANATION_SMALL_OFFSET), Palette::Black);
+	FontAsset(Fonts::KEY_EXPLANATION)(kigo_show_text)
+		.draw(panelKigo.pos.movedBy(UI::EXPLANATION_SMALL_OFFSET),
+			  Palette::Black);
 
-	FontAsset(U"Explanation")(show_text).draw(panelMain.pos.movedBy(30, 16),
-											  Palette::Black);
+	FontAsset(Fonts::KEY_EXPLANATION)(show_text).draw(
+		panelMain.pos.movedBy(UI::EXPLANATION_TEXT_OFFSET), Palette::Black);
 }
 
 void Renderer::drawTutorial(const String& text) const
 {
-	const RectF panel{60, 540, 1100, 140};
-	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.9});
-	panel.drawFrame(2, 0, Palette::Gray);
+	const RectF panel = UI::EXPLANATION_MAIN_PANEL;
+	panel.rounded(UI::EXPLANATION_PANEL_RADIUS)
+		.draw(UI::EXPLANATION_PANEL_COLOR);
+	panel.drawFrame(UI::EXPLANATION_FRAME_THICKNESS, 0, Palette::Gray);
 
 	String show_text = text;
 	show_text.replace(U"*", U"\n");
 
-	FontAsset(U"Explanation")(show_text).draw(panel.pos.movedBy(30, 16),
-											  Palette::Black);
+	FontAsset(Fonts::KEY_EXPLANATION)(show_text).draw(
+		panel.pos.movedBy(UI::EXPLANATION_TEXT_OFFSET), Palette::Black);
 }

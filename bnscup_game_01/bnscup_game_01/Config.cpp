@@ -1,4 +1,5 @@
 ﻿#include "Config.hpp"
+#include "GameConstants.hpp"
 
 void SaveData::serialize(JSON& json) const
 {
@@ -40,10 +41,10 @@ void SaveData::deserialize(const JSON& json)
 		}
 	}
 
-	// デフォルト値で初期化（3つの段位分）
-	if (gradeProgress.size() < 3)
+	// デフォルト値で初期化（段位数分）
+	if (gradeProgress.size() < GameConstants::RankNames::RANK_COUNT)
 	{
-		gradeProgress.resize(3, 0);
+		gradeProgress.resize(GameConstants::RankNames::RANK_COUNT, 0);
 	}
 
 	// problemStatus配列の手動読み取り

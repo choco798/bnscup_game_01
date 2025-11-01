@@ -1,17 +1,24 @@
 ﻿#include "HowToPlay.hpp"
+#include "GameConstants.hpp"
+
+using namespace GameConstants;
 
 // 簡易ヘルプ表示
 void DrawHowToOverlay()
 {
-	const RectF panel{140, 140, 1000, 440};
-	panel.rounded(16).draw(ColorF{1.0, 1.0, 1.0, 0.96});
-	panel.drawFrame(3, 0, Palette::Black);
-	FontAsset(U"Game")(U"あそびかた").draw(160, 160, Palette::Black);
+	const RectF panel = UI::HELP_OVERLAY_PANEL;
+	panel.rounded(UI::EXPLANATION_PANEL_RADIUS).draw(UI::HELP_OVERLAY_COLOR);
+	panel.drawFrame(UI::HELP_OVERLAY_FRAME_THICKNESS, 0, Palette::Black);
+	FontAsset(Fonts::KEY_GAME)(U"あそびかた")
+		.draw(UI::HELP_TITLE_POS, Palette::Black);
 
-	FontAsset(U"HowToPlay")(U"・俳句の中の季語の文字をクリックします。")
-		.draw(160, 220, Palette::Black);
-	FontAsset(U"HowToPlay")(U"・季語が無い句は「季語なし」をクリックします。")
-		.draw(160, 260, Palette::Black);
-	FontAsset(U"HowToPlay")(U"・正解で点数が追加。解説が表示されます。")
-		.draw(160, 300, Palette::Black);
+	FontAsset(Fonts::KEY_HOW_TO_PLAY)(U"・俳句の中の季語の文字をクリックします。")
+		.draw(UI::HELP_TEXT_BASE_POS, Palette::Black);
+	FontAsset(Fonts::KEY_HOW_TO_PLAY)(
+		U"・季語が無い句は「季語なし」をクリックします。")
+		.draw(UI::HELP_TEXT_BASE_POS.movedBy(0, UI::HELP_TEXT_LINE_HEIGHT),
+			  Palette::Black);
+	FontAsset(Fonts::KEY_HOW_TO_PLAY)(U"・正解で点数が追加。解説が表示されます。")
+		.draw(UI::HELP_TEXT_BASE_POS.movedBy(0, UI::HELP_TEXT_LINE_HEIGHT * 2),
+			  Palette::Black);
 }

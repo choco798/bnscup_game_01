@@ -18,7 +18,7 @@ class TextLayouter
 	double m_clientSize;
 
    public:
-	TextLayouter(const String fontName, double maxWidth, double lineHeightScale,
+	TextLayouter(const StringView& fontName, double maxWidth, double lineHeightScale,
 				 double lineWidthScale, double clientSize);
 	Array<LayoutChar> layout(const String &text) const;
 

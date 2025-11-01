@@ -1,6 +1,6 @@
 ﻿#include "ConfigManager.hpp"
 
-bool ConfigManager::initialize(const FilePath& path)
+bool ConfigManager::initialize(const StringView& path)
 {
 	m_configPath = path;
 

@@ -1,10 +1,14 @@
 ﻿#include "ResultScene.hpp"
+#include "GameConstants.hpp"
+
+using namespace GameConstants;
 
 ResultScene::ResultScene(const InitData& data) : IScene{data}
 {
-	Size rect_size(260, 56);
-	m_backBtn = ui::Button(U"タイトルへ", U"Score",
-						   Vec2{780 + rect_size.x / 2, 470 + rect_size.y / 2});
+	const Size rect_size = UI::RESULT_BUTTON_SIZE;
+	m_backBtn = ui::Button(
+		U"タイトルへ", Fonts::KEY_SCORE,
+		UI::RESULT_BUTTON_BASE_POS + Vec2{rect_size.x / 2, rect_size.y / 2});
 }
 
 void ResultScene::update()
@@ -36,16 +40,18 @@ void ResultScene::draw() const
 {
 	getData().renderer.drawBackground();
 
-	FontAsset(U"Result")(U"結果発表")
-		.drawAt(Scene::Center().x, 140, Palette::Black);
+	FontAsset(Fonts::KEY_RESULT)(U"結果発表")
+		.drawAt(Scene::Center().x, UI::RESULT_TITLE_Y_POS, Palette::Black);
 
-	RoundRect panel{RectF{200, 220, 880, 320}, 20};
-	panel.draw(ColorF{1.0, 1.0, 1.0, 0.92}).drawFrame(3, 0, Palette::Black);
+	RoundRect panel{UI::RESULT_PANEL, UI::RESULT_PANEL_RADIUS};
+	panel.draw(UI::EXPLANATION_PANEL_COLOR)
+		.drawFrame(UI::HELP_OVERLAY_FRAME_THICKNESS, 0, Palette::Black);
 
-	FontAsset(U"Score")(U"正解数: {}"_fmt(getData().gameState.correctCount))
-		.draw(240, 260, Palette::Black);
-	FontAsset(U"Score")(U"スコア: {}"_fmt(getData().gameState.score))
-		.draw(240, 320, Palette::Black);
+	FontAsset(Fonts::KEY_SCORE)(
+		U"正解数: {}"_fmt(getData().gameState.correctCount))
+		.draw(UI::RESULT_CORRECT_COUNT_POS, Palette::Black);
+	FontAsset(Fonts::KEY_SCORE)(U"スコア: {}"_fmt(getData().gameState.score))
+		.draw(UI::RESULT_SCORE_POS, Palette::Black);
 
 	m_backBtn.draw();
 }

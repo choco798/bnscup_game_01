@@ -14,7 +14,7 @@ class Renderer
 	String m_fontName;
 
    public:
-	void initRenderer(const String fontName);
+	void initRenderer(const StringView& fontName);
 	void drawBackground() const;
 	void drawHaiku(const Array<LayoutChar>& chars) const;
 	void drawTeacherNormal() const;

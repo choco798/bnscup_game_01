@@ -1,6 +1,7 @@
 ﻿#include "ProblemManager.hpp"
+#include "GameConstants.hpp"
 
-bool ProblemManager::loadFromJSON(const FilePath& path)
+bool ProblemManager::loadFromJSON(const StringView& path)
 {
 	// 全配列をクリア
 	m_problems.clear();
@@ -27,10 +28,10 @@ bool ProblemManager::loadFromJSON(const FilePath& path)
 		p.kigoStart = pj[U"kigoStart"].getOr<int32>(-1);
 		p.kigoEnd = pj[U"kigoEnd"].getOr<int32>(-1);
 		p.explanation = pj[U"explanation"].getOr<String>(U"");
-		p.grade =
-			pj[U"grade"].getOr<int32>(ProblemGrade::Trainee);	// デフォルトは特待生
-		p.ruby = pj[U"ruby"].getOr<String>(U"");		// フリガナ情報
-		p.rhythm = pj[U"rhythm"].getOr<String>(U"");	// リズム情報
+		p.grade = pj[U"grade"].getOr<int32>(
+			ProblemGrade::Trainee);					  // デフォルトは特待生
+		p.ruby = pj[U"ruby"].getOr<String>(U"");	  // フリガナ情報
+		p.rhythm = pj[U"rhythm"].getOr<String>(U"");  // リズム情報
 
 		// タグ情報の読み込み
 		if (const auto tags = pj[U"tags"]; tags && tags.isArray())
@@ -118,7 +119,8 @@ bool ProblemManager::isGradeAvailable(int32 grade, size_t playerRank) const
 void ProblemManager::setSelectedGrade(int32 grade)
 {
 	// 無効な段位は選択できない
-	if (grade < 0 || grade >= ProblemGrade::Count)
+	if (grade != GameConstants::DEFAULT_SELECTED_GRADE &&
+		(grade < 0 || grade >= ProblemGrade::Count))
 	{
 		return;
 	}

@@ -35,7 +35,7 @@ struct ButtonStyle
 class Button
 {
    public:
-	Button(const String& text = U"", const String& fontAssetKey = U"",
+	Button(const StringView& text = U"", const StringView& fontAssetKey = U"",
 		   const Vec2& pos = Vec2{0, 0});
 
 	// 配置・テキスト変更

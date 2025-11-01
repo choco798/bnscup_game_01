@@ -1,6 +1,6 @@
 ﻿#include "UiButton.hpp"
 
-ui::Button::Button(const String& text, const String& fontAssetKey,
+ui::Button::Button(const StringView& text, const StringView& fontAssetKey,
 						  const Vec2& pos)
 	: m_text(text), m_fontKey(fontAssetKey), m_pos(pos)
 {

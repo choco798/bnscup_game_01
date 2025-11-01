@@ -12,7 +12,7 @@ class ProblemManager
 	ProblemManager() = default;
 
 	// 基本操作
-	bool loadFromJSON(const FilePath& path);
+	bool loadFromJSON(const StringView& path);
 	const Array<Problem>& getProblems() const noexcept
 	{
 		return m_problems;

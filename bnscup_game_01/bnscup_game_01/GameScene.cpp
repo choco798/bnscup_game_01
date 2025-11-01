@@ -1,19 +1,26 @@
 ﻿#include "GameScene.hpp"
+#include "GameConstants.hpp"
 
 // ローカル関数定義
 
 ColorF GeneratePastelColor()
 {
+	using namespace GameConstants::UI;
 	// HSV空間でランダムに生成（パステル調にする）
-	double hue = Random(0.0, 360.0);	   // 色相：全範囲
-	double saturation = Random(0.2, 0.3);  // 彩度：低め（0〜1）
-	double value = Random(0.9, 1.0);	   // 明度：高め（明るい色）
+	double hue = Random(HUE_RANGE_MIN, HUE_RANGE_MAX);	// 色相：全範囲
+	double saturation =
+		Random(PASTEL_SAT_MIN, PASTEL_SAT_MAX);	 // 彩度：低め（0〜1）
+	double value =
+		Random(PASTEL_VAL_MIN, PASTEL_VAL_MAX);	 // 明度：高め（明るい色）
 
 	return HSV{hue, saturation, value};
 }
 
-void DrawRadialFadeCircle(const Circle& c, const ColorF& base, int steps = 16)
+void DrawRadialFadeCircle(const Circle& c, const ColorF& base,
+						  int steps = GameConstants::UI::RADIAL_FADE_STEPS)
 {
+	using namespace GameConstants;
+
 	double prevR = 0.0;
 	for (int i = 1; i <= steps; ++i)
 	{
@@ -24,7 +31,7 @@ void DrawRadialFadeCircle(const Circle& c, const ColorF& base, int steps = 16)
 		double a = 1.0 - t;
 
 		// ちょっと柔らかく（スムースステップ）
-		a = a * a * (3.0 - 2.0 * a);
+		a = a * a * (UI::SMOOTH_STEP_FACTOR_A - UI::SMOOTH_STEP_FACTOR_B * a);
 
 		Circle(c.center, r).drawFrame(thickness, 0.0, ColorF(base, base.a * a));
 		prevR = r;
@@ -39,9 +46,12 @@ static inline double frac(double x)
 
 // 方向ヒント（風・粒子の流れ）：t01 ∈ [0,1] を進行度として受け取り描画する
 // area: 描画エリア / dir: 流れの方向ベクトル / t01: 0〜1の時間 / count: 粒子数
-void DrawFlowHintPastel(const RectF& area, Vec2 dir, double t01,
-						size_t count = 300)
+void DrawFlowHintPastel(
+	const RectF& area, Vec2 dir, double t01,
+	size_t count = GameConstants::UI::FLOW_HINT_PARTICLE_COUNT)
 {
+	using namespace GameConstants;
+
 	// デフォルト方向（未指定なら右向き）
 	if (dir.isZero())
 	{
@@ -50,16 +60,20 @@ void DrawFlowHintPastel(const RectF& area, Vec2 dir, double t01,
 	const Vec2 nDir = dir.normalized();
 
 	// 流れの見た目チューニング
-	const double baseSpeed = 180.0;	   // 基本スピード（px / 周期）
-	const double swirlScale = 10.0;	   // 横揺れの大きさ
-	const double swirlFreq = 6.28318;  // 横揺れの周波数（2π）
-	const double trailLength = 26.0;   // 軌跡の長さ
+	const double baseSpeed = UI::FLOW_HINT_BASE_SPEED;	// 基本スピード（px / 周期）
+	const double swirlScale = UI::FLOW_HINT_SWIRL_SCALE;  // 横揺れの大きさ
+	const double swirlFreq = UI::FLOW_HINT_SWIRL_FREQ;	// 横揺れの周波数（2π）
+	const double trailLength = UI::FLOW_HINT_TRAIL_LENGTH;	// 軌跡の長さ
 	const double alphaBase =
-		(t01 < 0.1) ? t01 * 10 * 0.26
-					: ((0.9 < t01) ? (1 - t01) * 10 * 0.26
-								   : 0.26);	 // 粒子の基本アルファ（やわらかく）
-	const double satMin = 0.28, satMax = 0.45;	// パステル彩度
-	const double valMin = 0.95, valMax = 1.00;	// パステル明度
+		(t01 < 0.1)
+			? t01 * 10 * UI::RADIAL_FADE_ALPHA_BASE
+			: ((0.9 < t01)
+				   ? (1 - t01) * 10 * UI::RADIAL_FADE_ALPHA_BASE
+				   : UI::RADIAL_FADE_ALPHA_BASE);  // 粒子の基本アルファ（やわらかく）
+	const double satMin = UI::PASTEL_SAT_MIN,
+				 satMax = UI::PASTEL_SAT_MAX;  // パステル彩度
+	const double valMin = UI::PASTEL_VAL_MIN,
+				 valMax = UI::PASTEL_VAL_MAX;  // パステル明度
 
 	// 直交方向（横揺れ用）
 	const Vec2 ortho = Vec2{-nDir.y, nDir.x};
@@ -67,24 +81,33 @@ void DrawFlowHintPastel(const RectF& area, Vec2 dir, double t01,
 	for (size_t i = 0; i < count; ++i)
 	{
 		// 擬似乱数（インデックスのみから決まる → 純粋）
-		const double r0 = frac(std::sin((i + 0.5) * 12.9898) * 43758.5453);
-		const double r1 = frac(std::sin((i + 2.5) * 78.2330) * 12345.6789);
-		const double r2 = frac(std::sin((i + 4.5) * 34.1234) * 98765.4321);
-		const double r3 = frac(std::sin((i + 6.5) * 19.9753) * 54321.1234);
+		const double r0 =
+			frac(std::sin((i + UI::RANDOM_OFFSET_1) * UI::RANDOM_SEED_1) *
+				 UI::RANDOM_MULT_1);
+		const double r1 =
+			frac(std::sin((i + UI::RANDOM_OFFSET_2) * UI::RANDOM_SEED_2) *
+				 UI::RANDOM_MULT_2);
+		const double r2 =
+			frac(std::sin((i + UI::RANDOM_OFFSET_3) * UI::RANDOM_SEED_3) *
+				 UI::RANDOM_MULT_3);
+		const double r3 =
+			frac(std::sin((i + UI::RANDOM_OFFSET_4) * UI::RANDOM_SEED_4) *
+				 UI::RANDOM_MULT_4);
 
 		// 進行度に対する開始オフセット（ループ感を出す）
 		const double phase = frac(r0 + t01);
 
 		// エリア内の初期位置（決定的に散らす）
-		Vec2 basePos{area.x + area.w * frac(r1 + 0.37 * i),
-					 area.y + area.h * frac(r2 + 0.61 * i)};
+		Vec2 basePos{area.x + area.w * frac(r1 + UI::POSITION_OFFSET_1 * i),
+					 area.y + area.h * frac(r2 + UI::POSITION_OFFSET_2 * i)};
 
 		// 進行に応じた移動量（エリア対角を基準に大きさ調整）
 		const double loopDist = baseSpeed;	// 1 周期での移動距離（px）
 		Vec2 advect = nDir * (loopDist * phase);
 
 		// 横揺れ（やわらかい流れ感）
-		double wobble = std::sin((r3 * 7.0 + phase) * swirlFreq);
+		double wobble =
+			std::sin((r3 * UI::SWIRL_MULTIPLIER + phase) * swirlFreq);
 		Vec2 offset = ortho * (wobble * swirlScale);
 
 		// 位置合成 → エリア内にラップ（はみ出しをループ）
@@ -102,15 +125,17 @@ void DrawFlowHintPastel(const RectF& area, Vec2 dir, double t01,
 		p.y = wrap(p.y, area.y, area.y + area.h);
 
 		// パステル色（HSV）：色相は全域、彩度低め、明度高め
-		const double hue = 360.0 * r1;
+		const double hue = UI::HUE_RANGE_MAX * r1;
 		const double sat = Math::Lerp(satMin, satMax, r2);
 		const double val = Math::Lerp(valMin, valMax, r3);
 
 		// 粒子サイズとアルファ（中心ほど濃く、端は淡く）
-		const double size = Math::Lerp(4.0, 8.0, r0);
+		const double size =
+			Math::Lerp(UI::PARTICLE_SIZE_MIN, UI::PARTICLE_SIZE_MAX, r0);
 		const double a =
-			alphaBase *
-			(0.75 + 0.25 * std::cos(phase * Math::Pi * 2));	 // ゆるく呼吸する
+			alphaBase * (UI::ALPHA_BREATHE_BASE +
+						 UI::ALPHA_BREATHE_AMPLITUDE *
+							 std::cos(phase * Math::Pi * 2));  // ゆるく呼吸する
 
 		const ColorF col = HSV{hue, sat, val, a};
 
@@ -130,7 +155,8 @@ GameScene::GameScene(const InitData& init) : IScene(init)
 	getData().sound.stopBGM();
 	startProblem();
 
-	m_noKigoBtn = ui::Button(U"季語なし", U"Game", Vec2(960, 140));
+	m_noKigoBtn = ui::Button(U"季語なし", GameConstants::Fonts::KEY_GAME,
+							 GameConstants::UI::NO_KIGO_BUTTON_POS);
 }
 
 void GameScene::startProblem()
@@ -144,14 +170,14 @@ void GameScene::startProblem()
 	}
 
 	const auto& ui = getData().configManager.ui();
-	TextLayouter layouter{U"Game", ui.maxLineWidth, ui.lineHeightScale,
-						  ui.lineWidthScale,
+	TextLayouter layouter{GameConstants::Fonts::KEY_GAME, ui.maxLineWidth,
+						  ui.lineHeightScale, ui.lineWidthScale,
 						  static_cast<double>(ui.clientSizeX)};
 	m_chars = layouter.layout(
 		getData().gameState.problems[getData().gameState.currentIndex].text);
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
-	const Vec2 base{ui.clientSizeX / 2, 60};
+	const Vec2 base = GameConstants::UI::GAME_BASE_POSITION;
 	for (auto& c : m_chars)
 	{
 		c.pos += base;
@@ -164,7 +190,8 @@ void GameScene::update()
 	// ミスクリック時に方向を示す
 	if (m_flowTime > 0.0f)
 	{
-		m_flowTime -= Scene::DeltaTime() / 3.0f;
+		m_flowTime -=
+			Scene::DeltaTime() / GameConstants::UI::FLOW_TIME_DURATION;
 	}
 	m_noKigoBtn.update();
 
@@ -191,7 +218,8 @@ void GameScene::draw() const
 
 	if (getData().gameState.currentIndex >= getData().gameState.problems.size())
 	{
-		FontAsset(U"Game")(U"終了！").drawAt(Scene::Center(), Palette::Black);
+		FontAsset(GameConstants::Fonts::KEY_GAME)(U"終了！").drawAt(
+			Scene::Center(), Palette::Black);
 		return;
 	}
 
@@ -300,8 +328,10 @@ void GameScene::drawWordRect(s3d::int32 i, const UIConfig& ui) const
 	// inflated.draw(Palette::White);
 
 	// 放射状グラデーション（中心が濃く、外側が薄い）
-	Circle rectCenter{inflated.center(), (inflated.w + inflated.h) / 2};
-	DrawRadialFadeCircle(rectCenter, ColorF(GeneratePastelColor(), 0.5));
+	Circle rectCenter{inflated.center(),
+		(inflated.w + inflated.h) * GameConstants::UI::CIRCLE_RADIUS_RATIO};
+	DrawRadialFadeCircle(rectCenter, ColorF(GeneratePastelColor(), 0.5),
+						 GameConstants::UI::RADIAL_FADE_STEPS);
 }
 
 Vec2 GameScene::getKigoRectCenter() const
@@ -336,7 +366,9 @@ Vec2 GameScene::getKigoRectCenter() const
 RectF GameScene::Inflate(const RectF& r, double padPx, double padScale)
 {
 	const double pad = padPx + (r.w * padScale);
-	return RectF{r.x - pad, r.y - pad, r.w + pad * 2.0, r.h + pad * 2.0};
+	return RectF{r.x - pad, r.y - pad,
+				 r.w + pad * GameConstants::UI::PADDING_MULTIPLIER,
+				 r.h + pad * GameConstants::UI::PADDING_MULTIPLIER};
 }
 
 bool GameScene::isHitKigo() const
@@ -424,7 +456,7 @@ void GameScene::handleClick()
 void GameScene::ExecWrong()
 {
 	getData().sound.playWrong();
-	m_flowTime = 1.0f;
+	m_flowTime = GameConstants::UI::FLOW_TIME_RESET;
 	m_flowStartPos = Cursor::Pos();
 }
 
@@ -435,10 +467,11 @@ void GameScene::ExecCorrect()
 	if (!m_showExplanation)
 	{
 		getData().gameState.score +=
-			10 * (getData()
-					  .gameState.problems[getData().gameState.currentIndex]
-					  .grade +
-				  1);
+			GameConstants::SCORE_MULTIPLIER_BASE *
+			(getData()
+				 .gameState.problems[getData().gameState.currentIndex]
+				 .grade +
+			 1);
 		getData().gameState.correctCount += 1;
 		m_showExplanation = true;
 	}

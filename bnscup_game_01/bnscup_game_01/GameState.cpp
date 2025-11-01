@@ -1,6 +1,8 @@
 ﻿#include "GameState.hpp"
 #include "ConfigManager.hpp"
+#include "GameConstants.hpp"
 #include "SaveDataManager.hpp"
+
 
 GameState::GameState(SaveDataManager& saveManager, ConfigManager& configManager,
 					 ProblemManager& problemManager)
@@ -26,8 +28,8 @@ void GameState::loadFromSaveData()
 void GameState::state_reset()
 {
 	currentIndex = 0;
-	score = 0;
-	correctCount = 0;
+	score = GameConstants::INITIAL_SCORE;
+	correctCount = GameConstants::INITIAL_CORRECT_COUNT;
 	answered = false;
 
 	// 選択された段位の問題を設定
@@ -39,8 +41,8 @@ void GameState::state_reset()
 		problems = gradeProblems;
 
 		// 問題順をシャッフル
-		const bool IsNeedShuffle = false;
-		if (IsNeedShuffle && !problems.isEmpty())
+		if (GameConstants::Gameplay::DEFAULT_SHUFFLE_ENABLED &&
+			!problems.isEmpty())
 		{
 			problems.shuffle();
 		}
@@ -69,8 +71,7 @@ String GameState::currentRankName() const
 
 String GameState::getRankName(size_t index) const
 {
-	if (ranks.isEmpty()) return U"";
-	return ranks[Min(index, ranks.size() - 1)];
+	return GameConstants::RankNames::getRankName(index);
 }
 
 size_t GameState::getProgressForGrade(int32 grade) const
@@ -108,7 +109,7 @@ void GameState::updateProgress(const Problem& problem, bool correct)
 bool GameState::updateRank()
 {
 	auto& saveData = m_saveManager.getData();
-	if (saveData.rankIndex >= ranks.size() - 1)
+	if (saveData.rankIndex >= GameConstants::MAX_RANK_INDEX)
 	{
 		return false;  // すでに最高段位
 	}
@@ -119,19 +120,22 @@ bool GameState::updateRank()
 bool GameState::canPromote() const
 {
 	const auto& saveData = m_saveManager.getData();
-	const size_t requiredCorrect = 5;  // 昇段に必要な正解数
+	const size_t requiredCorrect = GameConstants::PROMOTION_REQUIRED_CORRECT;
 
 	// 段位に応じた昇段条件
 	switch (saveData.rankIndex)
 	{
 		case 0:	 // 特待生から名人へ
-			return saveData.gradeProgress[ProblemGrade::Trainee] >= requiredCorrect;
+			return saveData.gradeProgress[ProblemGrade::Trainee] >=
+				   requiredCorrect;
 
 		case 1:	 // 名人から達人へ
-			return saveData.gradeProgress[ProblemGrade::Master] >= requiredCorrect;
+			return saveData.gradeProgress[ProblemGrade::Master] >=
+				   requiredCorrect;
 
 		case 2:	 // 達人から俳人へ
-			return saveData.gradeProgress[ProblemGrade::Expert] >= requiredCorrect;
+			return saveData.gradeProgress[ProblemGrade::Expert] >=
+				   requiredCorrect;
 
 		default:
 			return false;
@@ -155,13 +159,15 @@ bool GameState::isGradeAvailable(int32 grade) const
 void GameState::setSelectedGrade(int32 grade)
 {
 	// 無効な段位は選択できない
-	if (grade < 0 || grade >= ProblemGrade::Count)
+	if (grade != GameConstants::DEFAULT_SELECTED_GRADE &&
+		(grade < 0 || grade >= ProblemGrade::Count))
 	{
 		return;
 	}
 
 	// 利用可能な段位のみ選択可能
-	if (!isGradeAvailable(grade))
+	if (grade != GameConstants::DEFAULT_SELECTED_GRADE &&
+		!isGradeAvailable(grade))
 	{
 		return;
 	}

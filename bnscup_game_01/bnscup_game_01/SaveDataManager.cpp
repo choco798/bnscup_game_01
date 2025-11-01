@@ -1,6 +1,6 @@
 ﻿#include "SaveDataManager.hpp"
 
-bool SaveDataManager::initialize(const FilePath& path)
+bool SaveDataManager::initialize(const StringView& path)
 {
 	m_saveDataPath = path;
 

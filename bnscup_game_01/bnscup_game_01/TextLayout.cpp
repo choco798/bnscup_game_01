@@ -1,6 +1,9 @@
 ﻿#include "TextLayout.hpp"
+#include "GameConstants.hpp"
 
-TextLayouter::TextLayouter(const String fontName, double maxWidth,
+using namespace GameConstants;
+
+TextLayouter::TextLayouter(const StringView& fontName, double maxWidth,
 						   double lineHeightScale, double lineWidthScale,
 						   double clientSize)
 	: m_fontName{fontName},
@@ -28,8 +31,8 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 	double text_x = 0.0;
 	double text_y = 0.0;
 	int32 index = 0;
-	int32 lineCount = 1;
-	int32 headPos = 1;
+	int32 lineCount = UI::LINE_COUNT_START;
+	int32 headPos = UI::HEAD_POSITION_START;
 
 	String token;
 
@@ -67,10 +70,9 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 		// 強制y位置を3つ戻す
 		if (ch == U'^')
 		{
-			const int32 BackPos = 2;
 			text_y = static_cast<double>(localFont.height()) *
-					 (headPos - BackPos - 1);
-			headPos -= BackPos;
+					 (headPos - UI::BACK_POSITION_OFFSET - 1);
+			headPos -= UI::BACK_POSITION_OFFSET;
 			continue;
 		}
 
@@ -103,7 +105,7 @@ Array<LayoutChar> TextLayouter::layout(const String& text) const
 							  lineCount, headPos, breakablePositions);
 		}
 
-		const bool disp_space_box = false;
+		const bool disp_space_box = UI::DISPLAY_SPACE_BOX;
 		// スペースを 1 文字として位置進行（可視描画しないが矩形は持つ）
 		if (disp_space_box)
 		{

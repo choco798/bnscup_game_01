@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Config.hpp"
+#include "GameConstants.hpp"
 
 class SaveDataManager
 {
@@ -12,7 +13,7 @@ class SaveDataManager
 	~SaveDataManager() = default;
 
 	// 初期化（ファイル読み込み）
-	bool initialize(const FilePath& path);
+	bool initialize(const StringView& path);
 
 	// セーブデータの保存
 	bool save() const;
@@ -34,6 +35,12 @@ class SaveDataManager
 	}
 	void setCurrentRank(size_t rank)
 	{
+		if (rank > GameConstants::MAX_RANK_INDEX)
+		{
+			Console << U"[SaveDataManager] Invalid rank: " << rank
+					<< U", max is: " << GameConstants::MAX_RANK_INDEX;
+			return;
+		}
 		m_saveData.rankIndex = rank;
 	}
 
@@ -47,10 +54,13 @@ class SaveDataManager
 
 	void incrementGradeProgress(size_t grade)
 	{
-		if (grade < m_saveData.gradeProgress.size())
+		if (grade >= m_saveData.gradeProgress.size())
 		{
-			m_saveData.gradeProgress[grade]++;
+			Console << U"[SaveDataManager] Invalid grade index for increment: "
+					<< grade;
+			return;
 		}
+		m_saveData.gradeProgress[grade]++;
 	}
 
 	// スコア関連
@@ -66,16 +76,22 @@ class SaveDataManager
 	// 問題クリア状況
 	bool isProblemCleared(size_t index) const
 	{
-		return (index < m_saveData.problemStatus.size())
-				   ? m_saveData.problemStatus[index]
-				   : false;
+		if (index >= m_saveData.problemStatus.size())
+		{
+			Console << U"[SaveDataManager] Invalid problem index: " << index;
+			return false;
+		}
+		return m_saveData.problemStatus[index];
 	}
 
 	void setProblemCleared(size_t index, bool cleared = true)
 	{
-		if (index < m_saveData.problemStatus.size())
+		if (index >= m_saveData.problemStatus.size())
 		{
-			m_saveData.problemStatus[index] = cleared;
+			Console << U"[SaveDataManager] Invalid problem index for set: "
+					<< index;
+			return;
 		}
+		m_saveData.problemStatus[index] = cleared;
 	}
 };

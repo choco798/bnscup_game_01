@@ -1,4 +1,7 @@
 ﻿#include "SoundManager.hpp"
+#include "GameConstants.hpp"
+
+using namespace GameConstants;
 
 void SoundManager::loadAssets()
 {
@@ -42,7 +45,7 @@ void SoundManager::playWrong()
 
 void SoundManager::setBgmVolume(double v)
 {
-	m_bgmVolume = Clamp(v, 0.0, 1.0);
+	m_bgmVolume = Clamp(v, Game::MIN_VOLUME, Game::MAX_VOLUME);
 	if (m_bgm)
 	{
 		m_bgm.setVolume(m_bgmVolume);
@@ -50,7 +53,7 @@ void SoundManager::setBgmVolume(double v)
 }
 void SoundManager::setSeVolume(double v)
 {
-	m_seVolume = Clamp(v, 0.0, 1.0);
+	m_seVolume = Clamp(v, Game::MIN_VOLUME, Game::MAX_VOLUME);
 }
 double SoundManager::getBgmVolume() const noexcept
 {

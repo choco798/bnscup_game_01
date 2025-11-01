@@ -3,6 +3,7 @@
 #include <Siv3D.hpp>
 
 #include "Config.hpp"
+#include "GameConstants.hpp"
 #include "GameScene.hpp"
 #include "GameState.hpp"
 #include "HowToPlay.hpp"
@@ -13,6 +14,7 @@
 #include "SoundManager.hpp"
 #include "TitleScene.hpp"
 #include "UiButton.hpp"
+
 
 enum class SceneID
 {
@@ -26,29 +28,34 @@ namespace
 
 void InitializeGameAsset()
 {
-	// フォントアセットを登録する
-	FontAsset::Register(U"Title", FontMethod::MSDF, 64,
+	using namespace GameConstants::Fonts;
+
+	// フォントアセットを登録する（定数使用）
+	FontAsset::Register(KEY_TITLE, FontMethod::MSDF, SIZE_TITLE,
 						Typeface::CJK_Regular_JP);
-	FontAsset::Register(U"TitleText", FontMethod::MSDF, 32,
+	FontAsset::Register(KEY_TITLE_TEXT, FontMethod::MSDF, SIZE_TITLE_TEXT,
 						Typeface::CJK_Regular_JP);
-	FontAsset::Register(U"Game", FontMethod::MSDF, 48,
+	FontAsset::Register(KEY_GAME, FontMethod::MSDF, SIZE_GAME,
 						Typeface::CJK_Regular_JP);
-	FontAsset::Register(U"Explanation", FontMethod::MSDF, 30,
+	FontAsset::Register(KEY_EXPLANATION, FontMethod::MSDF, SIZE_EXPLANATION,
 						Typeface::CJK_Regular_JP);
-	FontAsset::Register(U"Menu", FontMethod::MSDF, 48, Typeface::Bold);
-	FontAsset::Register(U"HowToPlay", FontMethod::MSDF, 28, Typeface::Bold);
-	FontAsset::Register(U"Result", FontMethod::MSDF, 56, Typeface::Bold);
-	FontAsset::Register(U"Score", FontMethod::MSDF, 32);
-	FontAsset::Register(U"Copyright", FontMethod::MSDF, 16);
-	FontAsset::Wait(U"Title");
-	FontAsset::Wait(U"TitleText");
-	FontAsset::Wait(U"Game");
-	FontAsset::Wait(U"Explanation");
-	FontAsset::Wait(U"Menu");
-	FontAsset::Wait(U"HowToPlay");
-	FontAsset::Wait(U"Result");
-	FontAsset::Wait(U"Score");
-	FontAsset::Wait(U"Copyright");
+	FontAsset::Register(KEY_MENU, FontMethod::MSDF, SIZE_MENU, Typeface::Bold);
+	FontAsset::Register(KEY_HOW_TO_PLAY, FontMethod::MSDF, SIZE_HOW_TO_PLAY,
+						Typeface::Bold);
+	FontAsset::Register(KEY_RESULT, FontMethod::MSDF, SIZE_RESULT,
+						Typeface::Bold);
+	FontAsset::Register(KEY_SCORE, FontMethod::MSDF, SIZE_SCORE);
+	FontAsset::Register(KEY_COPYRIGHT, FontMethod::MSDF, SIZE_COPYRIGHT);
+
+	// 非同期読み込み待機
+	const Array<StringView> fontKeys = {
+		KEY_TITLE,		 KEY_TITLE_TEXT, KEY_GAME,	KEY_EXPLANATION, KEY_MENU,
+		KEY_HOW_TO_PLAY, KEY_RESULT,	 KEY_SCORE, KEY_COPYRIGHT};
+
+	for (const auto& key : fontKeys)
+	{
+		FontAsset::Wait(key);
+	}
 }
 }  // namespace
 
@@ -57,34 +64,40 @@ void Main()
 	// ゲームアセットを準備する
 	::InitializeGameAsset();
 
-	const RectF panel{140, 140, 1000, 440};
-	ui::Button closeHowToBtn{
-		U"　閉じる　", U"HowToPlay",
-		Vec2{panel.x + panel.w - 120, panel.y + panel.h - 44}};
-
+	// UI座標を定数化
+	using namespace GameConstants::UI;
+	const RectF panel{HELP_PANEL_POS, HELP_PANEL_SIZE};
+	ui::Button closeHowToBtn{U"　閉じる　",
+							 GameConstants::Fonts::KEY_HOW_TO_PLAY,
+							 Vec2{panel.x + panel.w - CLOSE_BUTTON_OFFSET.x,
+								  panel.y + panel.h - CLOSE_BUTTON_OFFSET.y}};
 
 	// シーン管理
 	KigoGameApp manager;
 
-	// 設定ロード
+	// 設定ロード（定数ファイルパス使用）
 	if (manager.get())
 	{
 		manager.get()->sound.loadAssets();
-		manager.get()->saveDataManager.initialize(U"savedata.json");
-		manager.get()->configManager.initialize(U"config.json");
-		// 問題ロード
-		if (!manager.get()->problemManager.loadFromJSON(U"problems.json"))
+		manager.get()->saveDataManager.initialize(
+			GameConstants::FilePaths::SAVE_DATA);
+		manager.get()->configManager.initialize(
+			GameConstants::FilePaths::CONFIG);
+
+		// 問題ロード（エラーメッセージ定数使用）
+		if (!manager.get()->problemManager.loadFromJSON(
+				GameConstants::FilePaths::PROBLEMS))
 		{
 			System::MessageBoxOK(
-				U"問題ファイルの読み込みに失敗しました。\nAssets/problems.json "
-				U"を確認してください。");
+				GameConstants::ErrorMessages::PROBLEM_FILE_LOAD_FAILED);
 		}
+
 		manager.get()->gameState.initialize();
-		manager.get()->renderer.initRenderer(U"Game");
+		manager.get()->renderer.initRenderer(GameConstants::Fonts::KEY_GAME);
 
 		Window::Resize(manager.get()->configManager.ui().clientSizeX,
 					   manager.get()->configManager.ui().clientSizeY);
-		Scene::SetBackground(ColorF{0.95});
+		Scene::SetBackground(BACKGROUND_COLOR);
 	}
 
 	manager.add<TitleScene>(State::Title);

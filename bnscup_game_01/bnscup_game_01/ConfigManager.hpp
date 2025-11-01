@@ -13,7 +13,7 @@ class ConfigManager
 	~ConfigManager() = default;
 
 	// 設定ファイルの読み込み
-	bool initialize(const FilePath& path);
+	bool initialize(const StringView& path);
 
 	// UIConfig へのアクセス
 	const UIConfig& ui() const noexcept
