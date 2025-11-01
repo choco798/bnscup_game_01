@@ -152,6 +152,8 @@ void TitleScene::draw() const
 	FontAsset(Fonts::KEY_TITLE)(U"季語シンクロ！")
 		.drawAt(Scene::Center().x, UI::TITLE_Y_POS, Palette::Black);
 
+	// TODO: ここを画像に差し替える
+
 	// UI要素の描画
 	drawGradeButtons();
 	drawCurrentRankPanel();
