@@ -11,7 +11,7 @@ struct ProblemGrade
 
 struct Problem
 {
-	int32 index;		 // 問題番号（配列インデックス）
+	int32 index{0};		 // 問題番号（配列インデックス）
 	String id;			 // 問題ID
 	String author;		 // 作者名
 	String source;		 // 出典
@@ -42,7 +42,7 @@ struct Problem
 
    public:
 	// デフォルトコンストラクタ
-	Problem() : hasKigo(false), kigoStart(-1), kigoEnd(-1)
+	Problem() : index(0), hasKigo(false), kigoStart(-1), kigoEnd(-1)
 	{
 	}
 

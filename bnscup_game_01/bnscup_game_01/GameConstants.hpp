@@ -18,7 +18,7 @@ namespace Game
 {
 constexpr double MIN_VOLUME = 0.0;
 constexpr double MAX_VOLUME = 1.0;
-}
+}  // namespace Game
 
 // === UI描画パラメータ ===
 namespace UI
@@ -124,7 +124,7 @@ constexpr double HUE_RANGE_MAX = 360.0;
 constexpr double FLOW_TIME_RESET = 1.0f;
 constexpr double CIRCLE_RADIUS_RATIO = 0.5;	 // (w + h) / 2 の計算用
 constexpr double PARTICLE_SIZE_MIN = 4.0;
-constexpr double PARTICLE_SIZE_MAX = 8.0;
+constexpr double PARTICLE_SIZE_MAX = 12.0;
 constexpr double ALPHA_BREATHE_BASE = 0.75;
 constexpr double ALPHA_BREATHE_AMPLITUDE = 0.25;
 constexpr double SMOOTH_STEP_FACTOR_A = 3.0;
@@ -161,6 +161,7 @@ namespace Fonts
 constexpr int32 SIZE_TITLE = 64;
 constexpr int32 SIZE_TITLE_TEXT = 32;
 constexpr int32 SIZE_GAME = 48;
+constexpr int32 SIZE_RUBY = 24;
 constexpr int32 SIZE_EXPLANATION = 30;
 constexpr int32 SIZE_MENU = 48;
 constexpr int32 SIZE_HOW_TO_PLAY = 28;
@@ -172,6 +173,7 @@ constexpr int32 SIZE_COPYRIGHT = 16;
 constexpr StringView KEY_TITLE = U"Title";
 constexpr StringView KEY_TITLE_TEXT = U"TitleText";
 constexpr StringView KEY_GAME = U"Game";
+constexpr StringView KEY_RUBY = U"Ruby";
 constexpr StringView KEY_EXPLANATION = U"Explanation";
 constexpr StringView KEY_MENU = U"Menu";
 constexpr StringView KEY_HOW_TO_PLAY = U"HowToPlay";
@@ -192,7 +194,7 @@ constexpr StringView PROBLEMS = U"problems.json";
 namespace ErrorMessages
 {
 constexpr StringView PROBLEM_FILE_LOAD_FAILED =
-	U"問題ファイルの読み込みに失敗しました。\nAssets/problems.json "
+	U"問題ファイルの読み込みに失敗しました。\\App\\problems.json "
 	U"を確認してください。";
 constexpr StringView JSON_PARSE_FAILED = U"JSONファイルの解析に失敗しました";
 constexpr StringView FILE_NOT_FOUND = U"ファイルが見つかりません";

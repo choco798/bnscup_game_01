@@ -32,6 +32,7 @@ bool ProblemManager::loadFromJSON(const StringView& path)
 			ProblemGrade::Trainee);					  // デフォルトは特待生
 		p.ruby = pj[U"ruby"].getOr<String>(U"");	  // フリガナ情報
 		p.rhythm = pj[U"rhythm"].getOr<String>(U"");  // リズム情報
+		p.displayRuby = pj[U"displayRuby"].getOr<bool>(false);	// リズム情報
 
 		// タグ情報の読み込み
 		if (const auto tags = pj[U"tags"]; tags && tags.isArray())

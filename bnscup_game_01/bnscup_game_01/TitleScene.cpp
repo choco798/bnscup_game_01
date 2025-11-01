@@ -27,14 +27,14 @@ void TitleScene::update()
 	// メインボタンの更新
 	updateMainButtons();
 
-	// 段位選択ボタンの更新
-	updateGradeButtons();
-
 	// ヘルプ表示中は入力無効
 	if (getData().showHowToPlay)
 	{
 		return;
 	}
+
+	// 段位選択ボタンの更新
+	updateGradeButtons();
 
 	// 音量スライダーの更新
 	updateVolumeSliders();

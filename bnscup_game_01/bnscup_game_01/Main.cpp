@@ -15,7 +15,6 @@
 #include "TitleScene.hpp"
 #include "UiButton.hpp"
 
-
 enum class SceneID
 {
 	Title,
@@ -36,6 +35,8 @@ void InitializeGameAsset()
 	FontAsset::Register(KEY_TITLE_TEXT, FontMethod::MSDF, SIZE_TITLE_TEXT,
 						Typeface::CJK_Regular_JP);
 	FontAsset::Register(KEY_GAME, FontMethod::MSDF, SIZE_GAME,
+						U"Yuji_Boku/YujiBoku-Regular.ttf");
+	FontAsset::Register(KEY_RUBY, FontMethod::MSDF, SIZE_RUBY,
 						Typeface::CJK_Regular_JP);
 	FontAsset::Register(KEY_EXPLANATION, FontMethod::MSDF, SIZE_EXPLANATION,
 						Typeface::CJK_Regular_JP);
@@ -46,11 +47,15 @@ void InitializeGameAsset()
 						Typeface::Bold);
 	FontAsset::Register(KEY_SCORE, FontMethod::MSDF, SIZE_SCORE);
 	FontAsset::Register(KEY_COPYRIGHT, FontMethod::MSDF, SIZE_COPYRIGHT);
+}
 
+void WaitGameAssetLoad()
+{
+	using namespace GameConstants::Fonts;
 	// 非同期読み込み待機
 	const Array<StringView> fontKeys = {
-		KEY_TITLE,		 KEY_TITLE_TEXT, KEY_GAME,	KEY_EXPLANATION, KEY_MENU,
-		KEY_HOW_TO_PLAY, KEY_RESULT,	 KEY_SCORE, KEY_COPYRIGHT};
+		KEY_TITLE, KEY_TITLE_TEXT,	KEY_GAME,	KEY_RUBY,  KEY_EXPLANATION,
+		KEY_MENU,  KEY_HOW_TO_PLAY, KEY_RESULT, KEY_SCORE, KEY_COPYRIGHT};
 
 	for (const auto& key : fontKeys)
 	{
@@ -99,6 +104,8 @@ void Main()
 					   manager.get()->configManager.ui().clientSizeY);
 		Scene::SetBackground(BACKGROUND_COLOR);
 	}
+
+	::WaitGameAssetLoad();
 
 	manager.add<TitleScene>(State::Title);
 	manager.add<GameScene>(State::Game);

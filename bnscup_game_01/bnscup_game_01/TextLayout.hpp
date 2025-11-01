@@ -1,11 +1,21 @@
 ﻿#pragma once
 
+// フリガナ付き文字を表現する構造体
+struct RubyChar
+{
+	String baseText;	   // 漢字部分
+	String rubyText;	   // フリガナ部分
+	bool hasRuby = false;  // フリガナ有無
+};
+
 struct LayoutChar
 {
-	char32 ch;			// 文字
-	Vec2 pos;			// 描画位置
-	RectF box;			// 当たり判定矩形
-	int32 globalIndex;	// text内インデックス
+	char32 ch{};			// 文字
+	Vec2 pos{};				// 描画位置
+	RectF box{};			// 当たり判定矩形
+	int32 globalIndex{};	// text内インデックス
+	Optional<String> ruby{};// フリガナテキスト
+	Vec2 rubyPos{};			// フリガナ描画位置
 };
 
 // レイアウト処理の状態を管理する構造体
@@ -40,11 +50,20 @@ class TextLayouter
 					  Array<LayoutChar>& out) const;
 	void finalizeLayout(Array<LayoutChar>& out, const Font& font) const;
 
+	// フリガナ関連メソッド
+	Array<RubyChar> parseRubyText(const String& rubyText) const;
+	void processWordWithRuby(const String& word, const Optional<String>& ruby,
+							 const Font& font, LayoutState& state,
+							 Array<LayoutChar>& out) const;
+	Vec2 calculateRubyPosition(const Vec2& basePos, const String& ruby) const;
+
    public:
 	TextLayouter(const StringView& fontName, double maxWidth,
 				 double lineHeightScale, double lineWidthScale,
 				 double clientSize);
 	Array<LayoutChar> layout(const String& text) const;
+	Array<LayoutChar> layoutWithRuby(const String& text,
+									 const String& ruby) const;
 
 	void InsertBreakInText(double& text_y, double& text_x, double lineWidth,
 						   double localFontY, int32_t& lineCount,

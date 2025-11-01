@@ -177,5 +177,6 @@ void GameState::setSelectedHighestGrade()
 	const auto& saveData = m_saveManager.getData();
 
 	// プレイヤーの現在の段位より下の段位は常にプレイ可能
-	selectedGrade = static_cast<int32>(saveData.rankIndex);
+	selectedGrade =
+		Min(static_cast<int32>(saveData.rankIndex), ProblemGrade::Expert);
 }

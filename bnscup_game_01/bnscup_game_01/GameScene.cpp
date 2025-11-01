@@ -60,7 +60,8 @@ void DrawFlowHintPastel(
 	const Vec2 nDir = dir.normalized();
 
 	// 流れの見た目チューニング
-	const double baseSpeed = UI::FLOW_HINT_BASE_SPEED;	// 基本スピード（px / 周期）
+	const double baseSpeed =
+		UI::FLOW_HINT_BASE_SPEED;  // 基本スピード（px / 周期）
 	const double swirlScale = UI::FLOW_HINT_SWIRL_SCALE;  // 横揺れの大きさ
 	const double swirlFreq = UI::FLOW_HINT_SWIRL_FREQ;	// 横揺れの周波数（2π）
 	const double trailLength = UI::FLOW_HINT_TRAIL_LENGTH;	// 軌跡の長さ
@@ -170,11 +171,21 @@ void GameScene::startProblem()
 	}
 
 	const auto& ui = getData().configManager.ui();
+	const auto& problem =
+		getData().gameState.problems[getData().gameState.currentIndex];
 	TextLayouter layouter{GameConstants::Fonts::KEY_GAME, ui.maxLineWidth,
 						  ui.lineHeightScale, ui.lineWidthScale,
 						  static_cast<double>(ui.clientSizeX)};
-	m_chars = layouter.layout(
-		getData().gameState.problems[getData().gameState.currentIndex].text);
+
+	// フリガナ表示が有効な場合はlayoutWithRubyを使用
+	if (problem.displayRuby && !problem.ruby.isEmpty())
+	{
+		m_chars = layouter.layoutWithRuby(problem.text, problem.ruby);
+	}
+	else
+	{
+		m_chars = layouter.layout(problem.text);
+	}
 
 	// 俳句表示の開始位置（左上）にオフセットを与える
 	Vec2 base = GameConstants::UI::GAME_BASE_POSITION;
@@ -187,6 +198,7 @@ void GameScene::startProblem()
 	for (auto& c : m_chars)
 	{
 		c.pos += base;
+		c.rubyPos += base;
 		c.box.moveBy(base);
 	}
 }
@@ -230,9 +242,9 @@ void GameScene::draw() const
 	}
 
 	// チュートリアルに関しては特別扱い
-	const bool isTutorial =
-		(getData().gameState.currentIndex == 0) &&
-		(getData().gameState.currentRankName() == GameConstants::RankNames::getRankName(0));
+	const bool isTutorial = (getData().gameState.currentIndex == 0) &&
+							(getData().gameState.currentRankName() ==
+							 GameConstants::RankNames::getRankName(0));
 
 	if (m_showExplanation || isTutorial)
 	{
@@ -253,8 +265,17 @@ void GameScene::draw() const
 						   (m_flowStartPos - getKigoRectCenter()), m_flowTime);
 	}
 
-	// 俳句本文
-	getData().renderer.drawHaiku(m_chars);
+	// 俳句本文（フリガナ対応）
+	const auto& problem =
+		getData().gameState.problems[getData().gameState.currentIndex];
+	if (problem.displayRuby && !problem.ruby.isEmpty())
+	{
+		getData().renderer.drawHaikuWithRuby(m_chars);
+	}
+	else
+	{
+		getData().renderer.drawHaiku(m_chars);
+	}
 
 	// 季語なしボタン（簡易）
 	m_noKigoBtn.draw();
@@ -336,7 +357,8 @@ void GameScene::drawWordRect(s3d::int32 i, const UIConfig& ui) const
 	// inflated.draw(Palette::White);
 
 	// 放射状グラデーション（中心が濃く、外側が薄い）
-	Circle rectCenter{inflated.center(),
+	Circle rectCenter{
+		inflated.center(),
 		(inflated.w + inflated.h) * GameConstants::UI::CIRCLE_RADIUS_RATIO};
 	DrawRadialFadeCircle(rectCenter, ColorF(GeneratePastelColor(), 0.5),
 						 GameConstants::UI::RADIAL_FADE_STEPS);

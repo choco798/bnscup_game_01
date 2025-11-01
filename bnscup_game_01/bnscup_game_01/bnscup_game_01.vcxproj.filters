@@ -896,5 +896,8 @@
     <ClInclude Include="ConfigManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameConstants.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -108,3 +108,30 @@ void Renderer::drawTutorial(const String& text) const
 	FontAsset(Fonts::KEY_EXPLANATION)(show_text).draw(
 		panel.pos.movedBy(UI::EXPLANATION_TEXT_OFFSET), Palette::Black);
 }
+
+void Renderer::drawHaikuWithRuby(const Array<LayoutChar>& chars) const
+{
+	for (const auto& c : chars)
+	{
+		// 基本文字を描画
+		FontAsset(m_fontName)(String{1, c.ch}).draw(c.pos, Palette::Black);
+
+		// フリガナがある場合は描画
+		if (c.ruby.has_value())
+		{
+			drawRubyText(c.ruby.value(), c.rubyPos);
+		}
+	}
+}
+
+void Renderer::drawRubyText(const String& ruby, const Vec2& pos) const
+{
+	double ruby_y = 0;
+
+	for (auto word : ruby)
+	{
+		const auto drawRect = FontAsset(Fonts::KEY_RUBY)(word).draw(
+			pos + Vec2(0, ruby_y), Palette::Darkgray);
+		ruby_y += drawRect.h;
+	}
+}
