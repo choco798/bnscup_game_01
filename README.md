@@ -4,6 +4,8 @@
 
 Version 1.1  2025/11/02 リリースしました！  
 
+[ダウンロードはこちら！](https://drive.google.com/file/d/1TwNW_CKzInc4Boktlh6c6PyKk4eqtsTe/view?usp=drive_link)
+
 ## Copyright  
 プログラム・サウンド: [moqueca]  
 プログラム・イラスト: Nasatame [Nasatame.icon]  
