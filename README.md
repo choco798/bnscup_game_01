@@ -4,7 +4,7 @@
 
 Version 1.1  2025/11/02 リリースしました！  
 
-[ダウンロードはこちら！](https://drive.google.com/file/d/1TwNW_CKzInc4Boktlh6c6PyKk4eqtsTe/view?usp=drive_link)
+[ダウンロードはこちら！](https://drive.google.com/file/d/11DmS6JVHK9SQMHVckdVE4YMZM61FDH34/view?usp=drive_link)
 
 ## Copyright  
 プログラム・サウンド: [moqueca]  
