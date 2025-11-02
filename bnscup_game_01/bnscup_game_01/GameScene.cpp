@@ -431,7 +431,7 @@ void GameScene::handleClick()
 	{
 		if (m_beatTransport.isRunning())
 		{
-			m_beatTransport.resume();
+			m_beatTransport.pause();
 		}
 		else
 		{
