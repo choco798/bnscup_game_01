@@ -149,10 +149,14 @@ void TitleScene::draw() const
 {
 	// 背景とタイトル
 	Rect{Scene::Size()}.draw(UI::TITLE_BACKGROUND_COLOR);
+#if defined(FONT_TITLE)
 	FontAsset(Fonts::KEY_TITLE)(U"季語シンクロ！")
 		.drawAt(Scene::Center().x, UI::TITLE_Y_POS, Palette::Black);
-
-	// TODO: ここを画像に差し替える
+#else
+	TextureAsset(Textures::KEY_TITLE)
+		.scaled(0.5)
+		.drawAt(Scene::Center().x, UI::TITLE_Y_POS);
+#endif
 
 	// UI要素の描画
 	drawGradeButtons();
@@ -214,9 +218,9 @@ void TitleScene::drawVolumeControls() const
 void TitleScene::drawCopyrightInfo() const
 {
 	FontAsset(Fonts::KEY_COPYRIGHT)(
-		U"Version 0.5  2025/10/25\nCopyright\nプログラム・サウンド: Nasatame "
+		U"Version 1.1  2025/11/02\nCopyright\nプログラム・サウンド: Nasatame "
 		U"\nプログラム・イラスト: moqueca "
-		U"\n音楽：TAM Music Factory")
+		U"\n音楽：TAM Music Factory、効果音ラボ")
 		.draw(Scene::Rect().leftCenter() + UI::COPYRIGHT_OFFSET,
 			  Palette::Black);
 }

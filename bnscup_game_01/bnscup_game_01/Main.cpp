@@ -57,6 +57,9 @@ void InitializeGameAsset()
 						Typeface::Regular);
 	FontAsset::Register(KEY_UI_SMALL, FontMethod::MSDF, SIZE_UI_SMALL,
 						Typeface::Regular);
+
+	TextureAsset::Register(GameConstants::Textures::KEY_TITLE,
+						   GameConstants::FilePaths::TITLE_IMAGE);
 }
 
 void WaitGameAssetLoad()
@@ -73,6 +76,14 @@ void WaitGameAssetLoad()
 	{
 		FontAsset::Wait(key);
 	}
+
+	const Array<StringView> textureKeys = {KEY_TITLE};
+
+	for (const auto& key : fontKeys)
+	{
+		TextureAsset::Wait(key);
+	}
+
 }
 }  // namespace
 

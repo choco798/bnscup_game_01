@@ -9,6 +9,8 @@ ResultScene::ResultScene(const InitData& data) : IScene{data}
 	m_backBtn = ui::Button(
 		U"タイトルへ", Fonts::KEY_SCORE,
 		UI::RESULT_BUTTON_BASE_POS + Vec2{rect_size.x / 2, rect_size.y / 2});
+
+	getData().sound.playResult();
 }
 
 void ResultScene::update()
@@ -29,10 +31,11 @@ void ResultScene::update()
 			gameState.updateRank();
 
 			// セーブ失敗時はエラーメッセージを表示
-			System::MessageBoxOK(U"昇格通知",
-								 U" {} から {} へ昇格しました！\nおめでとうございます！！！ "_fmt(
-									 gameState.currentRankName(), prevRankName),
-								 MessageBoxStyle::Info);
+			System::MessageBoxOK(
+				U"昇格通知",
+				U" {} から {} へ昇格しました！\nおめでとうございます！！！ "_fmt(
+					prevRankName, gameState.currentRankName()),
+				MessageBoxStyle::Info);
 		}
 
 		// セーブを実行（1回のみ）

@@ -193,12 +193,19 @@ constexpr StringView KEY_COPYRIGHT = U"Copyright";
 constexpr StringView KEY_DEBUG = U"Debug";
 }  // namespace Fonts
 
+namespace Textures
+{
+// テクスチャキー
+constexpr StringView KEY_TITLE = U"Title";
+}
+
 // === ファイルパス ===
 namespace FilePaths
 {
 constexpr StringView SAVE_DATA = U"savedata.json";
 constexpr StringView CONFIG = U"config.json";
 constexpr StringView PROBLEMS = U"problems.json";
+constexpr StringView TITLE_IMAGE = U"Images/title_image.png";
 }  // namespace FilePaths
 
 // === エラーメッセージ ===

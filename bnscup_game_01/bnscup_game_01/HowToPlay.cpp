@@ -27,7 +27,7 @@ void DrawHowToOverlay()
 		.draw(UI::HELP_TEXT_BASE_POS.movedBy(0, UI::HELP_TEXT_LINE_HEIGHT * 3),
 			  Palette::Black);
 	FontAsset(Fonts::KEY_HOW_TO_PLAY)(
-		U"・間違えると、スコアが無くなる代わりにヒントポイントがもらえます。")
+		U"・間違えると、スコアが減る代わりにヒントポイントがもらえます。")
 		.draw(UI::HELP_TEXT_BASE_POS.movedBy(0, UI::HELP_TEXT_LINE_HEIGHT * 4),
 			  Palette::Black);
 	FontAsset(Fonts::KEY_HOW_TO_PLAY)(

@@ -8,6 +8,7 @@ void SoundManager::loadAssets()
 	m_bgm = Audio{U"bgm_se/op01.mp3", Loop::Yes};
 	m_seCorrect = Audio{U"bgm_se/correct1.mp3"};
 	m_seWrong = Audio{U"bgm_se/wrong1.mp3"};
+	m_seResult = Audio{U"bgm_se/result01.mp3"};
 	loadRhythmAssets();
 }
 
@@ -42,6 +43,15 @@ void SoundManager::playWrong()
 	{
 		m_seWrong.setVolume(m_seVolume);
 		m_seWrong.play();
+	}
+}
+
+void SoundManager::playResult()
+{
+	if (m_seResult)
+	{
+		m_seResult.setVolume(m_seVolume);
+		m_seResult.play();
 	}
 }
 

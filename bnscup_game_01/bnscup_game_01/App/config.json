@@ -1,19 +1,19 @@
 ﻿{
   "audio": {
-    "bgmVolume": 0.4,
-    "seVolume": 0.8444444444444444
+    "bgmVolume": 0.5,
+    "seVolume": 0.5
   },
   "rhythm": {
     "bpm": 120.0,
-    "micSensitivity": 2.0,
+    "micSensitivity": 1.0,
     "rhythmModeEnabled": true,
     "vadAbsOff": 0.01,
     "vadAbsOn": 0.005,
-    "vadAlpha": 0.01,
+    "vadAlpha": 0.060000000000000005,
     "vadBandHighHz": 6000.0,
     "vadBandLowHz": 80.0,
-    "vadKOff": 0.3,
-    "vadKOn": 0.5,
+    "vadKOff": 0.8,
+    "vadKOn": 1.5,
     "vadMinOffMs": 200,
     "vadMinOnMs": 80
   },
